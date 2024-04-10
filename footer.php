@@ -1,6 +1,6 @@
 <footer class="main-footer">
     <div class="footer-left">
-        حق چاپ © 1402 <div class="bullet"></div>طراحی توسط <a href="https://hshaker.ir/">حسین شاکر</a>
+        حق چاپ © 1403 <div class="bullet"></div>طراحی توسط <a href="https://hshaker.ir/">حسین شاکر</a> v0.0.1
     </div>
     <div class="footer-right">
     </div>

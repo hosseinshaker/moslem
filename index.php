@@ -33,7 +33,7 @@ function displayLowStockProducts($connection) {
     $connection->close();
 }
 
-displayLowStockProducts($connection);
+//displayLowStockProducts($connection);
 ?>
 
 

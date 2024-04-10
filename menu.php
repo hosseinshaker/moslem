@@ -2,7 +2,7 @@
 <div class="main-sidebar sidebar-style-2">
     <aside id="sidebar-wrapper">
         <div class="sidebar-brand">
-            <a href="<?php echo $base_url; ?>/index.php"> <img alt="تصویر" src="<?php echo $base_url; ?>/assets/img/logo-shirazcover.png" class="header-logo"> <span class="logo-name">
+            <a href="<?php echo $base_url; ?>/index.php"> <img alt="تصویر" src="<?php echo $base_url; ?>/assets/img/logo-m.png" class="header-logo"> <span class="logo-name">
                 <?php
 $columnName = "sitename";
 $tablename="options";
@@ -14,7 +14,7 @@ echo "$value";
         </div>
         <div class="sidebar-user">
             <div class="sidebar-user-picture">
-                <img alt="تصویر" src="<?php echo $base_url; ?>/assets/img/logo-shirazcover.png">
+                <img alt="تصویر" src="<?php echo $base_url; ?>/assets/img/logo-m.png">
             </div>
             <div class="sidebar-user-details">
                 <div class="user-name"><?php echo $_SESSION["username"];?></div>
