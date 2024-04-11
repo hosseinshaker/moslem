@@ -28,7 +28,6 @@ require_once '../../../header.php';
                     <nav class="form-row">
                         <div class="form-group col-md-8">
                             <label>نام محصول یا بارکد</label>
-
                     <select class="form-control select2 select2-hidden-accessible" tabindex="-1" aria-hidden="true">
                         <option>انتخاب</option>
                       <option>محصول 1</option>
@@ -40,16 +39,27 @@ require_once '../../../header.php';
                             <input type="number" class="form-control" name="productqr">
                         </div>
                     </nav>
+                    <nav class="form-row">
+                    <div class="form-group col-md-4">
                         <div class="form-group">
                                         <label>تاریخ ورود:</label>
                                         <input  id="datepicker-check-in" name="entryDate" class="form-control"required>
-                                    </div>
-
-                                    <div class="form-group ">
-                            <label>ساعت</label>
-                            <input type="text" class="form-control" name="clock" value="<?php echo jdate("H:i:s");  ?>">
                         </div>
-                        <button class="btn btn-primary" name="insert">افزودن</button>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <div class="form-group ">
+                            <label>ساعت</label>
+                            <input type="text" class="form-control" name="clock" value="<?php echo jdate("H:i");  ?>">
+                        </div>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <div class="form-group ">
+                        <label>شناسه ورود</label>
+                            <input type="text" class="form-control" name="id" value="<?php echo rand(100,999999999999999999); ?>">
+                        </div>
+                    </nav>
+                    </div>
+                    <button class="btn btn-primary" name="insert">ورود</button>    
                     </div>
                 </div>
             </form>
