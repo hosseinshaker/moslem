@@ -8,6 +8,7 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     exit;
 }
 require_once 'database.php';
+require_once 'jdf.php';
 require_once 'inc/functions.php';
 ?>
 <!DOCTYPE html>
