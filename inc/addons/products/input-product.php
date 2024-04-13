@@ -1,6 +1,13 @@
 <?php
 $title_page = "ورود محصولات جدید";
 require_once '../../../header.php';
+
+
+
+
+// products
+$products_sql = "SELECT * FROM products";
+$products_result = $connection->query($products_sql);
 ?>
 
 <div class="main-content">
@@ -23,15 +30,36 @@ require_once '../../../header.php';
                         <h4><?php echo $title_page;?></h4>
                     </div>
                     <div class="card-body">
-                        <div class="form-row">
-                            <div class="form-group col-md-8">
-                                <label for="productName">نام محصول یا بارکد</label>
-                                <input type="text" class="form-control" id="productName" name="productName">
+                        <div id="productsContainer">
+                            <div class="form-row productRow">
+                                <div class="form-group col-md-8">
+                             
+    <label>نام محصول و یا بارکد</label>
+    <select  name="productName[]" class="form-control select2" required>
+        <option value="">انتخاب</option>
+        <?php
+        if ($products_result->num_rows > 0) {
+            while ($products_row = $products_result->fetch_assoc()) {
+                echo '<option value="' . $products_row['productqr'] . '">' . $products_row['product_name'] .' کد: '.$products_row['productqr'] . '</option>';
+            }
+        } else {
+            echo "<option value=''>نتیجه‌ای یافت نشد</option>";
+        }
+        ?>
+    </select>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="productQuantity">تعداد</label>
+                                    
+                                    <input type="number" class="form-control productQuantity" name="productQuantity[]">
+                                </div>
+                                <div class="form-group col-md-1">
+                                    <button type="button" class="btn btn-danger removeProduct">-</button>
+                                </div>
                             </div>
-                            <div class="form-group col-md-4">
-                                <label for="productQuantity">تعداد</label>
-                                <input type="number" class="form-control" id="productQuantity" name="productQuantity">
-                            </div>
+                        </div>
+                        <div id="productControls">
+                            <button type="button" class="btn btn-success addProduct">افزودن</button>
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-4">
@@ -47,7 +75,7 @@ require_once '../../../header.php';
                                 <input type="text" class="form-control" name="id" value="<?php echo rand(100,999999999999999999); ?>">
                             </div>
                         </div>
-                        <div id="productInfo"></div>
+                       
                         <button type="submit" class="btn btn-primary" name="insert">ورود</button>
                     </div>
                 </div>
@@ -56,4 +84,33 @@ require_once '../../../header.php';
         <div class="col-12 col-md-1 col-lg-1"></div>
     </nav>
 </div>
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<!-- Custom script -->
+<script>
+    $(document).ready(function() {
+        // اضافه کردن فیلدهای محصول با کلیک بر روی دکمه افزودن
+        $(document).on('click', '.addProduct', function() {
+            $('#productsContainer').append('<div class="form-row productRow">' +
+                '<div class="form-group col-md-8">' +
+                '<select  name="productName[]" class="form-control select2" required><?php      if ($products_result->num_rows > 0) {            while ($products_row = $products_result->fetch_assoc()) {              echo '<option value="' . $products_row['productqr'] . '">' . $products_row['product_name'] .' کد: '.$products_row['productqr'] . '</option>'; }        } else {            echo "<option value=''>نتیجه‌ای یافت نشد</option>";        } ?></select>' +
+                '</div>' +
+                '<div class="form-group col-md-3">' +
+                '<input type="number" class="form-control productQuantity" name="productQuantity[]">' +
+                '</div>' +
+                '<div class="form-group col-md-1">' +
+                '<button type="button" class="btn btn-danger removeProduct">-</button>' +
+                '</div>' +
+                '</div>');
+        });
+        // حذف کردن فیلد محصول با کلیک بر روی دکمه حذف
+        $(document).on('click', '.removeProduct', function() {
+            $(this).closest('.productRow').remove();
+        });
+    });
+</script>
+
+
 <?php require_once '../../../footer.php'; ?>
