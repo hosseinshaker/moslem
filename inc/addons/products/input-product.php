@@ -56,31 +56,4 @@ require_once '../../../header.php';
         <div class="col-12 col-md-1 col-lg-1"></div>
     </nav>
 </div>
-
 <?php require_once '../../../footer.php'; ?>
-
-<script>
-$(document).ready(function () {
-    $('#productName').keyup(function () {
-        var query = $(this).val();
-        if (query != '') {
-            $.ajax({
-                url: "fetch_product.php",
-                method: "POST",
-                data: {query: query},
-                success: function (data) {
-                    $('#productInfo').fadeIn();
-                    $('#productInfo').html(data);
-                    // برای انتخاب محصول با کلیک بر روی آن
-                    $('#productInfo li').click(function () {
-                        var selectedProduct = $(this).text();
-                        $('#productName').val(selectedProduct);
-                        $('#productInfo').fadeOut();
-                    });
-                }
-            });
-        }
-    });
-});
-
-</script>
