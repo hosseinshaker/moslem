@@ -31,16 +31,16 @@ echo "$value";
             <li class="dropdown ">
                 <a href="#" class="nav-link has-dropdown"><i data-feather="server"></i><span>انبار محصول</span></a>
                 <ul class="dropdown-menu">
-                <?php  } ?>  
+                <?php  } ?>
                 <?php if (in_array(6, $accessArray)) {?>
                 <li><a class="nav-link" href="<?php echo $base_url; ?>/inc/addons/products/Product-output.php">ثبت خروج محصول از انبار</a></li>
-                <?php  } ?>  
+                <?php  } ?>
                 <?php if (in_array(7, $accessArray)) {?>
                 <li><a class="nav-link" href="<?php echo $base_url; ?>/inc/addons/products/product-input.php">ثبت ورود  محصول به انبار</a></li>
-                <?php  } ?> 
+                <?php  } ?>
                 <?php if (in_array(8, $accessArray)) {?>
-                    <li><a class="nav-link" href="<?php echo $base_url; ?>/inc/addons/products/insert-product.php">تعریف محصول جدید</a></li>
-                    <?php  } ?>  
+                    <li><a class="nav-link" href="<?php echo $base_url; ?>/inc/addons/products/register-product.php">تعریف محصول جدید</a></li>
+                    <?php  } ?>
                     <?php if (in_array(9, $accessArray)) {?>
                     <li><a class="nav-link" href="<?php echo $base_url; ?>/inc/addons/products/form-output.php">گزارش محصول های خروجی</a></li>
                     <?php  } ?>  
@@ -62,25 +62,7 @@ echo "$value";
                 <?php  } ?>  
                 <?php if (in_array(20, $accessArray)) {?>
                 <li><a class="nav-link" href="<?php echo $base_url; ?>/inc/addons/settings/settings.php">تنظیمات</a></li>
-                <?php  } ?>  
-                <?php if (in_array(21, $accessArray)) {?>
-                <li><a class="nav-link" href="<?php echo $base_url; ?>/inc/addons/settings/users-list.php">لیست پرسنل سامانه</a></li>
-                <?php  } ?>  
-                <?php if (in_array(22, $accessArray)) {?>
-                <li><a class="nav-link" href="<?php echo $base_url; ?>/inc/addons/settings/add-user.php">افزودن پرسنل به سامانه</a></li>
-                <?php  } ?> 
-                <?php if (in_array(15, $accessArray)) {?>
-                <li><a class="nav-link" href="<?php echo $base_url; ?>/inc/addons/settings/add-color.php">افزودن رنگ</a></li>
-                <?php  } ?>  
-                <?php if (in_array(17, $accessArray)) {?>
-                <li><a class="nav-link" href="<?php echo $base_url; ?>/inc/addons/settings/add-material.php">افزودن طرح</a></li>
-                <?php  } ?>  
-                <?php if (in_array(25, $accessArray)) {?>
-                <li><a class="nav-link" href="<?php echo $base_url; ?>/inc/addons/settings/list-colors.php">مدیریت رنگ ها</a></li>
-                <?php  } ?> 
-                <?php if (in_array(26, $accessArray)) {?>
-                <li><a class="nav-link" href="<?php echo $base_url; ?>/inc/addons/settings/list-materials.php">مدیریت طرح ها</a></li>
-                <?php  } ?> 
+                <?php  } ?>
                 <?php  if (in_array(20, $accessArray) || in_array(21, $accessArray) || in_array(22, $accessArray)|| in_array(25, $accessArray)|| in_array(26, $accessArray) ) {?>          
             </ul>
             </li>
