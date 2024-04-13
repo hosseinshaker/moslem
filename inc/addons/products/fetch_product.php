@@ -20,4 +20,3 @@ if (isset($_POST["query"])) {
     $output .= '</ul>';
 }
 echo $output;
-?>
