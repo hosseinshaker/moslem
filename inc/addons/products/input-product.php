@@ -67,5 +67,4 @@ require_once '../../../header.php';
         <div class="col-12 col-md-1 col-lg-1"></div>
     </nav>
 </div>
-
 <?php require_once '../../../footer.php'; ?>
