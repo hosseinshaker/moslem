@@ -47,7 +47,7 @@ $products_result = $connection->query($products_sql);
         }
         ?>
     </select>
-                                </div>
+        </div>
                                 <div class="form-group col-md-3">
                                     <label for="productQuantity">تعداد</label>
                                     
@@ -90,26 +90,55 @@ $products_result = $connection->query($products_sql);
 
 <!-- Custom script -->
 <script>
-    $(document).ready(function() {
-        // اضافه کردن فیلدهای محصول با کلیک بر روی دکمه افزودن
-        $(document).on('click', '.addProduct', function() {
-            $('#productsContainer').append('<div class="form-row productRow">' +
-                '<div class="form-group col-md-8">' +
-                '<select  name="productName[]" class="form-control select2" required><?php      if ($products_result->num_rows > 0) {            while ($products_row = $products_result->fetch_assoc()) {              echo '<option value="' . $products_row['productqr'] . '">' . $products_row['product_name'] .' کد: '.$products_row['productqr'] . '</option>'; }        } else {            echo "<option value=''>نتیجه‌ای یافت نشد</option>";        } ?></select>' +
-                '</div>' +
-                '<div class="form-group col-md-3">' +
-                '<input type="number" class="form-control productQuantity" name="productQuantity[]">' +
-                '</div>' +
-                '<div class="form-group col-md-1">' +
-                '<button type="button" class="btn btn-danger removeProduct">-</button>' +
-                '</div>' +
-                '</div>');
-        });
-        // حذف کردن فیلد محصول با کلیک بر روی دکمه حذف
-        $(document).on('click', '.removeProduct', function() {
-            $(this).closest('.productRow').remove();
+$(document).ready(function() {
+    // افزودن فیلد محصول با کلیک بر روی دکمه افزودن
+    $(document).on('click', '.addProduct', function() {
+        // ارسال درخواست AJAX به صفحه ajax.php
+        $.ajax({
+            url: 'ajax.php',
+            method: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    var products = response.products;
+                    // افزودن داده‌های محصولات به تگ select
+                    var options = '';
+                    products.forEach(function(product) {
+                        options += '<option value="' + product.productqr + '">' + product.product_name + ' کد: ' + product.productqr + '</option>';
+                    });
+                    // اضافه کردن فیلد محصول به فرم
+                    var newRow = '<div class="form-row productRow">' +
+                        '<div class="form-group col-md-8">' +
+                        '<select name="productName[]" class="form-control select2" required>' +
+                        '<option value="">انتخاب</option>' +
+                        options +
+                        '</select>' +
+                        '</div>' +
+                        '<div class="form-group col-md-3">' +
+                        '<input type="number" class="form-control productQuantity" name="productQuantity[]">' +
+                        '</div>' +
+                        '<div class="form-group col-md-1">' +
+                        '<button type="button" class="btn btn-danger removeProduct">-</button>' +
+                        '</div>' +
+                        '</div>';
+                    $('#productsContainer').append(newRow);
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+            }
         });
     });
+
+    // حذف کردن فیلد محصول با کلیک بر روی دکمه حذف
+    $(document).on('click', '.removeProduct', function() {
+        $(this).closest('.productRow').remove();
+    });
+});
+
+
 </script>
 
 
