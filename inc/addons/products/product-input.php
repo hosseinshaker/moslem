@@ -1,43 +1,64 @@
 <?php
 $title_page = "ورود محصولات جدید";
 require_once '../../../header.php';
-// اگر فرم ارسال شده است
+
+// Check if the form is submitted
 if(isset($_POST['insert'])) {
-    // دریافت مقادیر ارسال شده از فرم
-    $entryDate = $_POST['entryDate'];
-    $clock = $_POST['clock'];
-    $id = $_POST['id'];
-    $productNames = $_POST['productName'];
-    $productQuantities = $_POST['productQuantity'];
+    // Initialize an empty array to store product data
+    $products_data = array();
 
-    // آرایه‌ای برای ذخیره نام و بارکد محصولات 
-    $productsArray = [];
-
-    // ثبت محصولات و تعداد آن‌ها در جدول گزارشات و ساخت آرایه نام و بارکد
-    foreach($productNames as $key => $productName) {
-        $quantity = $productQuantities[$key];
-        $report_query = "INSERT INTO reports (entry_date, clock, id, product_name, quantity) VALUES ('$entryDate', '$clock', '$id', '$productName', '$quantity')";
-        $connection->query($report_query);
+    // Iterate through each submitted product
+    foreach($_POST['productName'] as $key => $product_name) {
+        // Get product details from the database based on the product name or barcode
+        $product_sql = "SELECT * FROM products WHERE productqr = '$product_name'";
+        $product_result = $connection->query($product_sql);
         
-        // اضافه کردن نام و بارکد به آرایه
-        $productsArray[] = ['name' => $productName, 'barcode' => $productQuantities[$key]];
+        if($product_result->num_rows > 0) {
+            $product_row = $product_result->fetch_assoc();
+            
+            // Construct product data array
+            $product_data = array(
+                'product_id' => $product_row['id'],
+                'product_name' => $product_row['product_name'],
+                'productqr' => $product_row['productqr'],
+                'quantity' => $_POST['productQuantity'][$key]
+            );
+
+            // Add product data to the main array
+            $products_data[] = $product_data;
+
+            // Update product quantity in the products table
+            $new_quantity = $product_row['stock'] + $_POST['productQuantity'][$key];
+            $update_sql = "UPDATE products SET stock = $new_quantity WHERE id = " . $product_row['id'];
+            $connection->query($update_sql);
+        }
     }
 
-    // تبدیل آرایه به JSON
-    $productsJSON = json_encode($productsArray);
+    // Convert product data array to JSON format
+    $json_data = json_encode($products_data);
 
-    // ذخیره JSON در دیتابیس
-    $save_query = "INSERT INTO products_array (products) VALUES ('$productsJSON')";
-    $connection->query($save_query);
+    // Insert JSON data into the reports table
+    $entry_date = $_POST['entryDate'];
+    $clock = $_POST['clock'];
+    $entry_id = $_POST['id'];
+
+    $insert_sql = "INSERT INTO products_input (entry_id, date, clock, product_data) VALUES ('$entry_id', '$entry_date', '$clock', '$json_data')";
+    $connection->query($insert_sql);
+
+    // Show success message
+    $message_sec="true";
 }
 
-// products
+// Retrieve products from the database
 $products_sql = "SELECT * FROM products";
 $products_result = $connection->query($products_sql);
 ?>
 
 <div class="main-content">
     <nav class="row">
+<?php  
+if(!empty($message_sec)){
+?>
         <div class="col-12 col-md-12 col-lg-12">
             <div class="alert alert-success alert-dismissible show fade">
                 <div class="alert-body">
@@ -48,6 +69,8 @@ $products_result = $connection->query($products_sql);
                 </div>
             </div>
         </div>
+
+        <?php } ?>
         <div class="col-12 col-md-1 col-lg-1"></div>
         <div class="col-12 col-md-10 col-lg-10">
             <form method="post" id="productForm">

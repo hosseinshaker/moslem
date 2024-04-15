@@ -15,14 +15,14 @@ function displayLowStockProducts($connection) {
     // افزودن یک محدوده بالایی برای productCount
     $maxCount = 10000; // مثلاً 10000 به عنوان محدوده بالایی
 
-    $sql = "SELECT * FROM primaryproduct WHERE productCount < minStock AND productCount < $maxCount";
+    $sql = "SELECT * FROM products WHERE stock < minStock AND stock < $maxCount";
     $result = $connection->query($sql);
 
     if ($result->num_rows > 0) {
         echo "<table class='table'><tr><th>ID</th><th>نام محصول</th><th>موجودی فعلی</th><th>حداقل موجودی</th></tr>";
 
         while($row = $result->fetch_assoc()) {
-            echo "<tr><td>".$row["id"]."</td><td>".$row["product_name"]."</td><td>".$row["productCount"]."</td><td>".$row["minStock"]."</td></tr>";
+            echo "<tr><td>".$row["id"]."</td><td>".$row["product_name"]."</td><td>".$row["stock"]."</td><td>".$row["minStock"]."</td></tr>";
         }
 
         echo "</table>";
@@ -33,7 +33,7 @@ function displayLowStockProducts($connection) {
     $connection->close();
 }
 
-//displayLowStockProducts($connection);
+displayLowStockProducts($connection);
 ?>
 
 
