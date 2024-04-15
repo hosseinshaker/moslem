@@ -1,9 +1,35 @@
 <?php
 $title_page = "ورود محصولات جدید";
 require_once '../../../header.php';
+// اگر فرم ارسال شده است
+if(isset($_POST['insert'])) {
+    // دریافت مقادیر ارسال شده از فرم
+    $entryDate = $_POST['entryDate'];
+    $clock = $_POST['clock'];
+    $id = $_POST['id'];
+    $productNames = $_POST['productName'];
+    $productQuantities = $_POST['productQuantity'];
 
+    // آرایه‌ای برای ذخیره نام و بارکد محصولات 
+    $productsArray = [];
 
+    // ثبت محصولات و تعداد آن‌ها در جدول گزارشات و ساخت آرایه نام و بارکد
+    foreach($productNames as $key => $productName) {
+        $quantity = $productQuantities[$key];
+        $report_query = "INSERT INTO reports (entry_date, clock, id, product_name, quantity) VALUES ('$entryDate', '$clock', '$id', '$productName', '$quantity')";
+        $connection->query($report_query);
+        
+        // اضافه کردن نام و بارکد به آرایه
+        $productsArray[] = ['name' => $productName, 'barcode' => $productQuantities[$key]];
+    }
 
+    // تبدیل آرایه به JSON
+    $productsJSON = json_encode($productsArray);
+
+    // ذخیره JSON در دیتابیس
+    $save_query = "INSERT INTO products_array (products) VALUES ('$productsJSON')";
+    $connection->query($save_query);
+}
 
 // products
 $products_sql = "SELECT * FROM products";
@@ -51,7 +77,7 @@ $products_result = $connection->query($products_sql);
                                 <div class="form-group col-md-3">
                                     <label for="productQuantity">تعداد</label>
                                     
-                                    <input type="number" class="form-control productQuantity" name="productQuantity[]">
+                                    <input type="number" class="form-control productQuantity" name="productQuantity[]" required>
                                 </div>
                                 <div class="form-group col-md-1">
                                     <button type="button" class="btn btn-danger removeProduct">-</button>
@@ -59,7 +85,7 @@ $products_result = $connection->query($products_sql);
                             </div>
                         </div>
                         <div id="productControls">
-                            <button type="button" class="btn btn-success addProduct">افزودن</button>
+                            <button type="button" class="btn btn-success addProduct"> افزودن محصول </button>
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-4">
@@ -76,7 +102,7 @@ $products_result = $connection->query($products_sql);
                             </div>
                         </div>
                        
-                        <button type="submit" class="btn btn-primary" name="insert">ورود</button>
+                        <button type="submit" class="btn btn-primary" name="insert">ورود محصول به انبار</button>
                     </div>
                 </div>
             </form>
@@ -115,7 +141,7 @@ $(document).ready(function() {
                         '</select>' +
                         '</div>' +
                         '<div class="form-group col-md-3">' +
-                        '<input type="number" class="form-control productQuantity" name="productQuantity[]">' +
+                        '<input type="number" class="form-control productQuantity" name="productQuantity[]" required>' +
                         '</div>' +
                         '<div class="form-group col-md-1">' +
                         '<button type="button" class="btn btn-danger removeProduct">-</button>' +
