@@ -122,6 +122,9 @@ $(document).ready(function() {
                         '</div>' +
                         '</div>';
                     $('#productsContainer').append(newRow);
+                    
+                    // اعمال Select2 بر روی المان select جدید
+                    $('.select2').select2();
                 } else {
                     alert(response.message);
                 }
@@ -136,10 +139,10 @@ $(document).ready(function() {
     $(document).on('click', '.removeProduct', function() {
         $(this).closest('.productRow').remove();
     });
+    
+    // اعمال Select2 بر روی المان‌های موجود در صفحه
+    $('.select2').select2();
 });
 
-
 </script>
-
-
 <?php require_once '../../../footer.php'; ?>
