@@ -10,6 +10,8 @@ if(isset($_POST['exit'])) {
     // Flag to track if any product has insufficient stock
     $insufficient_stock = false;
 
+
+
     // Check if all requested quantities are available in stock
     foreach($_POST['productName'] as $key => $product_name) {
         // Get product details from the database based on the product name or barcode
@@ -49,7 +51,6 @@ if(isset($_POST['exit'])) {
                 $new_quantity = $product_row['stock'] - $requested_quantity;
                 $update_sql = "UPDATE products SET stock = $new_quantity WHERE id = " . $product_row['id'];
                 $connection->query($update_sql);
-
                 // Construct product data array
                 $product_data = array(
                     'product_id' => $product_row['id'],
@@ -57,21 +58,25 @@ if(isset($_POST['exit'])) {
                     'productqr' => $product_row['productqr'],
                     'quantity' => $requested_quantity
                 );
-
                 // Add product data to the main array
                 $products_data[] = $product_data;
             }
         }
-
         // Convert product data array to JSON format
         $json_data = json_encode($products_data);
-
         // Insert JSON data into the exit reports table
         $exit_date = $_POST['exitDate'];
         $clock = $_POST['clock'];
         $exit_id = $_POST['id'];
-
-        $insert_sql = "INSERT INTO products_output (exit_id, date, clock, product_data) VALUES ('$exit_id', '$exit_date', '$clock', '$json_data')";
+        $user_name=$_SESSION["username"];
+        $kharidar_name=$_POST["kharidar_name"];
+        $kharidar_phone=$_POST["kharidar_phone"];
+        $ranande_name=$_POST["ranande_name"];
+        $ranande_phone=$_POST["ranande_phone"];
+        $ranande_pelak=$_POST["ranande_pelak"];
+        $bargekhoroj=$_POST["bargekhoroj"];
+        $comment=$_POST["comment"];
+        $insert_sql = "INSERT INTO products_output (exit_id, date, clock, product_data,user,kharidar_name,kharidar_phone,name_ranande,phone_ranande,pelak_khodro,shomareh_bargkhoroj,comment) VALUES ('$exit_id', '$exit_date', '$clock', '$json_data', '$user_name','$kharidar_name','$kharidar_phone','$ranande_name','$ranande_phone','$ranande_pelak','$bargekhoroj','$comment')";
         $connection->query($insert_sql);
 
         // Show success message
@@ -157,15 +162,45 @@ $products_result = $connection->query($products_sql);
                                 <input id="datepicker-check-out" name="exitDate" class="form-control" required>
                             </div>
                             <div class="form-group col-md-4">
-                                <label>ساعت</label>
+                                <label>ساعت خروج</label>
                                 <input type="text" class="form-control" name="clock" value="<?php echo jdate("H:i"); ?>">
                             </div>
                             <div class="form-group col-md-4">
                                 <label>شناسه خروج</label>
                                 <input type="text" class="form-control" name="id" value="<?php echo rand(100,999999999999999999); ?>">
                             </div>
+                            <div class="form-group col-md-4">
+                                <label>نام خریدار</label>
+                                <input type="text" class="form-control" name="kharidar_name" placeholder="نام خریدار را وارد کنید">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label>شماره تماس خریدار</label>
+                                <input type="number" class="form-control" name="kharidar_phone" placeholder="شماره خریدار را وارد کنید">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label>نام راننده</label>
+                                <input type="text" class="form-control" name="ranande_name" placeholder="نام راننده را وارد کنید">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label>شماره تماس راننده</label>
+                                <input type="number" class="form-control" name="ranande_phone" placeholder="شماره تماس راننده را وارد کنید">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label>شماره پلاک خودرو</label>
+                                <input type="text" class="form-control" name="ranande_pelak" placeholder="شماره پلاک خودرو را وارد کنید">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label>شماره برگه خروج</label>
+                                <input type="number" class="form-control" name="bargekhoroj" placeholder="شماره برگه خروج را وارد کنید">
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label>توضیحات</label>
+                             
+                                <textarea name="comment" class="form-control"></textarea>
+                            </div>               
+
                         </div>
-                        <button type="submit" class="btn btn-primary" name="exit">خروج محصول از انبار</button>
+                        <button type="submit" class="btn btn-primary" name="exit">خروج محصولات از انبار</button>
                     </div>
                 </div>
             </form>
