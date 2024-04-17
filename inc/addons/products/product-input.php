@@ -35,7 +35,8 @@ if(isset($_POST['insert'])) {
     }
 
     // Convert product data array to JSON format
-    $json_data = json_encode($products_data);
+    $json_data = json_encode($products_data, JSON_UNESCAPED_UNICODE);
+
     // Insert JSON data into the reports table
     $entry_date = $_POST['entryDate'];
     $clock = $_POST['clock'];

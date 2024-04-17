@@ -63,8 +63,7 @@ if(isset($_POST['exit'])) {
             }
         }
         // Convert product data array to JSON format
-        $json_data = json_encode($products_data);
-        // Insert JSON data into the exit reports table
+        $json_data = json_encode($products_data, JSON_UNESCAPED_UNICODE);        // Insert JSON data into the exit reports table
         $exit_date = $_POST['exitDate'];
         $clock = $_POST['clock'];
         $exit_id = $_POST['id'];

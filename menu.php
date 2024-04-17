@@ -67,6 +67,23 @@ echo "$value";
             </ul>
             </li>
             <?php  } ?> 
+
+
+            <?php  if (in_array(20, $accessArray) || in_array(21, $accessArray) || in_array(22, $accessArray)|| in_array(25, $accessArray)|| in_array(26, $accessArray) ) {?>          
+
+            <li class="dropdown ">
+            <a href="#" class="nav-link has-dropdown"><i data-feather="settings"></i><span>تنظیمات سامانه</span></a>
+            <ul class="dropdown-menu">
+
+            <li><a class="nav-link" href="<?php echo $base_url; ?>/inc/addons/settings/settings.php">تنظیمات</a></li>
+
+
+
+
+            </ul>
+            </li>
+            <?php  } ?>
+
             <?php if (in_array(24, $accessArray)) {?>
             <li><a class="nav-link text-info" href="<?php echo $base_url; ?>/backup.php"><i data-feather="database"></i><span>پشتیبان گیری از اطلاعات</span></a></li>
             <?php  } ?> 

@@ -12,40 +12,25 @@ $result = $connection->query($sql);
             <div class="col-12 col-md-12 col-lg-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4>گزارش انبار اولیه</h4>
+                        <h4>فرم جستجو میان فاکتور های ورودی</h4>
                     </div>
                     <div class="card-body">
                         <form method="post" action="list-input-product.php">
                             <nav class="form-row">
-                                <nav class="form-group col-md-6">
-                                    <div class="form-group">
-                                        <label>نام محصول اولیه</label>
-                                        <select name="productName" class="form-control select2">
-                                            <option value="">همه</option>
-                                            <?php
-                                            // حلقه برای نمایش گزینه‌ها
-                                            while ($row = $result->fetch_assoc()) :
-                                                $productName = $row['product_Name'];
-                                            ?>
-                                                <option value="<?php echo $productName; ?>"><?php echo $productName ; ?></option>
-                                            <?php endwhile; ?>
-                                        </select>
-                                    </div>
-                                </nav>
-                                <nav class="form-group col-md-6">
+                                <nav class="form-group col-md-4">
                                     <div class="form-group">
                                         <label>شناسه ورود</label>
                                           <input type="number" class="form-control" name="entry_id">
                                         </select>
                                     </div>
                                 </nav>
-                                <nav class="form-group col-md-6">
+                                <nav class="form-group col-md-4">
                                     <div class="form-group">
                                         <label>از تاریخ</label>
                                         <input id="datepicker-check-in" class="form-control" name="date_in">
                                     </div>
                                 </nav>
-                                <nav class="form-group col-md-6">
+                                <nav class="form-group col-md-4">
                                     <div class="form-group">
                                         <label>تا تاریخ</label>
                                         <input id="datepicker-Depart" class="form-control" name="date_out">
