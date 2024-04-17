@@ -36,13 +36,18 @@ if(isset($_POST['insert'])) {
 
     // Convert product data array to JSON format
     $json_data = json_encode($products_data);
-
     // Insert JSON data into the reports table
     $entry_date = $_POST['entryDate'];
     $clock = $_POST['clock'];
     $entry_id = $_POST['id'];
-
-    $insert_sql = "INSERT INTO products_input (entry_id, date, clock, product_data) VALUES ('$entry_id', '$entry_date', '$clock', '$json_data')";
+    $user_name=$_SESSION["username"];
+    $foroshande_name=$_POST["foroshande_name"];//foroshande
+    $foroshande_phone=$_POST["foroshande_phone"];
+    $ranande_name=$_POST["ranande_name"];
+    $ranande_phone=$_POST["ranande_phone"];
+    $ranande_pelak=$_POST["ranande_pelak"];
+    $comment=$_POST["comment"];
+    $insert_sql = "INSERT INTO products_input (entry_id, date, clock, product_data,user,foroshande_name,foroshande_phone,name_ranande,phone_ranande,pelak_khodro,comment) VALUES ('$entry_id', '$entry_date', '$clock', '$json_data', '$user_name','$foroshande_name','$foroshande_phone','$ranande_name','$ranande_phone','$ranande_pelak','$comment')";
     $connection->query($insert_sql);
 
     // Show success message
@@ -123,6 +128,31 @@ if(!empty($message_sec)){
                                 <label>شناسه ورود</label>
                                 <input type="text" class="form-control" name="id" value="<?php echo rand(100,999999999999999999); ?>">
                             </div>
+                            <div class="form-group col-md-4">
+                                <label>نام فروشنده</label>
+                                <input type="text" class="form-control" name="foroshande_name" placeholder="نام فروشنده را وارد کنید">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label>شماره تماس فروشنده</label>
+                                <input type="number" class="form-control" name="foroshande_phone" placeholder="شماره فروشنده را وارد کنید">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label>نام راننده</label>
+                                <input type="text" class="form-control" name="ranande_name" placeholder="نام راننده را وارد کنید">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label>شماره تماس راننده</label>
+                                <input type="number" class="form-control" name="ranande_phone" placeholder="شماره تماس راننده را وارد کنید">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label>شماره پلاک خودرو</label>
+                                <input type="text" class="form-control" name="ranande_pelak" placeholder="شماره پلاک خودرو را وارد کنید">
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label>توضیحات</label>
+                             
+                                <textarea name="comment" class="form-control"></textarea>
+                            </div>               
                         </div>
                        
                         <button type="submit" class="btn btn-primary" name="insert">ورود محصول به انبار</button>
