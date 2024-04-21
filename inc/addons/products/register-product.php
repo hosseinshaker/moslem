@@ -6,7 +6,7 @@ if(isset($_POST['insert'])){
     $product_name = $_POST['product_name'];//نام محصول اولیه
     $productqr = $_POST['productqr'];//شناسه محصول
     $minStock = $_POST['minStock'];//حداقل موجودی برای اخطار افزایش محصول
-
+    $pack = $_POST['pack'];
     // چک کردن وجود شناسه در دیتابیس
     $check_query = "SELECT * FROM products WHERE productqr = ?";
     $check_stmt = $connection->prepare($check_query);
@@ -19,9 +19,9 @@ if(isset($_POST['insert'])){
         $tekrari= "خطا: این شناسه قبلاً در دیتابیس وجود دارد.";
     } else {
         // اگر شناسه تکراری نیست، رکورد جدید اضافه شود
-        $insert_query = "INSERT INTO products (product_name, productqr, minStock) VALUES (?, ?, ?)";
+        $insert_query = "INSERT INTO products (product_name, productqr, minStock,pack) VALUES (?, ?, ?,?)";
         $insert_stmt = $connection->prepare($insert_query);
-        $insert_stmt->bind_param("sii", $product_name, $productqr, $minStock);
+        $insert_stmt->bind_param("siii", $product_name, $productqr, $minStock,$pack);
 
         if ($insert_stmt->execute() === TRUE) {
             $message_data= "True";
@@ -90,6 +90,10 @@ if(!empty($tekrari)){
                                     <div class="form-group ">
                                         <label>بارکد محصول(شناسه)</label>
                                         <input type="number" class="form-control" name="productqr">
+                                    </div>
+                                    <div class="form-group ">
+                                        <label>تعداد محصول در هر بسته</label>
+                                        <input type="number" class="form-control" name="pack">
                                     </div>
                                     <div class="form-group">
                                         <label>حداقل موجودی برای اخطار اتمامی محصول</label>

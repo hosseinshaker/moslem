@@ -2,7 +2,19 @@
 $title_page = "لیست محصولات ورودی";
 require_once '../../../header.php';
 
-// Retrieve products input data from the database
+if (isset($_GET['del'])) {
+    $id = $_GET['del'];
+    $sql = "DELETE FROM products_input WHERE id = ? LIMIT 1";
+    $stmt = $connection->prepare($sql);
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+
+    if ($stmt->affected_rows > 0) {
+        $del_message = "True";
+    } else {
+        echo "خطا در حذف رکورد: " . $connection->error;
+    }
+}
 if(isset($_POST['send'])){
     $entry_id = $_POST['entry_id'];
     $date_in = $_POST['date_in'];
@@ -74,7 +86,7 @@ if(isset($_POST['send'])){
                                         echo '<td>'.'
                                         <a target="_blank" href="view-input.php?id=' . $product_input_row['id'] . '" class="btn btn-icon btn-success"><i class="fas fa-eye"></i></a>
                                         <a target="_blank" href="edit-input.php?id=' . $product_input_row['id'] . '" class="btn btn-icon btn-primary"><i class="far fa-edit"></i></a>
-                                        <a href="delete-input.php?id=' . $product_input_row['id'] . '" class="btn btn-icon btn-danger"><i class="fas fa-times"></i></a>
+                                        <a href="list-input-product.php?del=' . $product_input_row['id'] . '" class="btn btn-icon btn-danger"><i class="fas fa-times"></i></a>
                                         '.'</td>';
                                         echo '</tr>';
                                         $row_count++;

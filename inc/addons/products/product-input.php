@@ -8,7 +8,7 @@ if(isset($_POST['insert'])) {
     $products_data = array();
 
     // Iterate through each submitted product
-    foreach($_POST['productName'] as $key => $product_name) {
+    foreach($_POST['productqrrr'] as $key => $product_name) {
         // Get product details from the database based on the product name or barcode
         $product_sql = "SELECT * FROM products WHERE productqr = '$product_name'";
         $product_result = $connection->query($product_sql);
@@ -62,101 +62,69 @@ $products_result = $connection->query($products_sql);
 
 <div class="main-content">
     <nav class="row">
-<?php  
-if(!empty($message_sec)){
-?>
-        <div class="col-12 col-md-12 col-lg-12">
-            <div class="alert alert-success alert-dismissible show fade">
-                <div class="alert-body">
-                    <button class="close" data-dismiss="alert">
-                        <span>×</span>
-                    </button>
-                    محصولات با موفقیت وارد شدند
-                </div>
-            </div>
-        </div>
-
-        <?php } ?>
         <div class="col-12 col-md-1 col-lg-1"></div>
         <div class="col-12 col-md-10 col-lg-10">
-            <form method="post" id="productForm">
+            <nav class="form-row">
+                <div class="card">
+                    <div class="card-header">
+                        <h6>شناسه کالا را وارد کنید</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="col-md-12 form-group">
+                            <input type="number" class="form-control productID" placeholder="شناسه محصول را وارد کنید">
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <form method="post">
                 <div class="card">
                     <div class="card-header">
                         <h4><?php echo $title_page;?></h4>
                     </div>
                     <div class="card-body">
                         <div id="productsContainer">
-                            <div class="form-row productRow">
-                                <div class="form-group col-md-8">
-                             
-    <label>نام محصول و یا بارکد</label>
-    <select  name="productName[]" class="form-control select2" required>
-        <option value="">انتخاب</option>
-        <?php
-        if ($products_result->num_rows > 0) {
-            while ($products_row = $products_result->fetch_assoc()) {
-                echo '<option value="' . $products_row['productqr'] . '">' . $products_row['product_name'] .' کد: '.$products_row['productqr'] . '</option>';
-            }
-        } else {
-            echo "<option value=''>نتیجه‌ای یافت نشد</option>";
-        }
-        ?>
-    </select>
-        </div>
-                                <div class="form-group col-md-3">
-                                    <label for="productQuantity">تعداد</label>
-                                    
-                                    <input type="number" class="form-control productQuantity" name="productQuantity[]" required>
-                                </div>
-                                <div class="form-group col-md-1">
-                                    <button type="button" class="btn btn-danger removeProduct">-</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="productControls">
-                            <button type="button" class="btn btn-success addProduct"> افزودن محصول </button>
+                            <!-- Existing products will be appended here -->
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-4">
                                 <label>تاریخ ورود:</label>
-                                <input id="datepicker-check-in" name="entryDate" class="form-control" required>
+                                <input id="datepicker-check-in" name="entryDate" class="form-control" required value="<?php echo jdate("Y/m/d",'','','','en'); ?>">
                             </div>
                             <div class="form-group col-md-4">
                                 <label>ساعت</label>
-                                <input type="text" class="form-control" name="clock" value="<?php echo jdate("H:i"); ?>">
+                                <input type="text" class="form-control" name="clock" value="<?php echo jdate("H:i",'','','','en'); ?>">
                             </div>
                             <div class="form-group col-md-4">
                                 <label>شناسه ورود</label>
-                                <input type="text" class="form-control" name="id" value="<?php echo rand(100,999999999999999999); ?>">
+                                <input type="text" class="form-control" name="id" value="<?php echo jdate("Y/m/d",'','','','en'); ?><?php echo rand(1,9999999); ?>">
                             </div>
                             <div class="form-group col-md-4">
                                 <label>نام فروشنده</label>
-                                <input type="text" class="form-control" name="foroshande_name" placeholder="نام فروشنده را وارد کنید">
+                                <input type="text" class="form-control" name="foroshande_name" placeholder="نام فروشنده را وارد کنید" value="گروه تولیدی مسلم">
                             </div>
                             <div class="form-group col-md-4">
                                 <label>شماره تماس فروشنده</label>
-                                <input type="number" class="form-control" name="foroshande_phone" placeholder="شماره فروشنده را وارد کنید">
+                                <input type="number" class="form-control" name="foroshande_phone" placeholder="شماره فروشنده را وارد کنید" value="09038483002">
                             </div>
                             <div class="form-group col-md-4">
                                 <label>نام راننده</label>
-                                <input type="text" class="form-control" name="ranande_name" placeholder="نام راننده را وارد کنید">
+                                <input type="text" class="form-control" name="ranande_name" placeholder="نام راننده را وارد کنید" value="علی کشاورز">
                             </div>
                             <div class="form-group col-md-4">
                                 <label>شماره تماس راننده</label>
-                                <input type="number" class="form-control" name="ranande_phone" placeholder="شماره تماس راننده را وارد کنید">
+                                <input type="number" class="form-control" name="ranande_phone" placeholder="شماره تماس راننده را وارد کنید" value="09171393541">
                             </div>
                             <div class="form-group col-md-4">
                                 <label>شماره پلاک خودرو</label>
-                                <input type="text" class="form-control" name="ranande_pelak" placeholder="شماره پلاک خودرو را وارد کنید">
+                                <input type="text" class="form-control text-center" name="ranande_pelak" placeholder="شماره پلاک خودرو را وارد کنید" value="77ل222 ایران 93">
                             </div>
                             <div class="form-group col-md-12">
                                 <label>توضیحات</label>
-                             
                                 <textarea name="comment" class="form-control"></textarea>
                             </div>               
                         </div>
-                       
-                        <button type="submit" class="btn btn-primary" name="insert">ورود محصول به انبار</button>
+                        <input type="submit" class="btn btn-primary" name="insert" id="insertButton" value="ورود محصولات به انبار"> 
                     </div>
                 </div>
             </form>
@@ -166,45 +134,51 @@ if(!empty($message_sec)){
 </div>
 
 <!-- jQuery library -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
-<!-- Custom script -->
+<script src="<?php echo $base_url; ?>/assets/js/jquery-3.6.0.min.js"></script>
 <script>
-$(document).ready(function() {
-    // افزودن فیلد محصول با کلیک بر روی دکمه افزودن
-    $(document).on('click', '.addProduct', function() {
-        // ارسال درخواست AJAX به صفحه ajax.php
+   $(document).ready(function() {
+    // Function to handle product search and addition
+    $('.productID').on('change', function() {
+        var productID = $(this).val();
         $.ajax({
-            url: 'ajax.php',
-            method: 'GET',
+            url: 'search_product.php', // Replace with actual URL for product search
+            method: 'POST',
             dataType: 'json',
+            data: { productID: productID },
             success: function(response) {
                 if (response.success) {
-                    var products = response.products;
-                    // افزودن داده‌های محصولات به تگ select
-                    var options = '';
-                    products.forEach(function(product) {
-                        options += '<option value="' + product.productqr + '">' + product.product_name + ' کد: ' + product.productqr + '</option>';
-                    });
-                    // اضافه کردن فیلد محصول به فرم
-                    var newRow = '<div class="form-row productRow">' +
-                        '<div class="form-group col-md-8">' +
-                        '<select name="productName[]" class="form-control select2" required>' +
-                        '<option value="">انتخاب</option>' +
-                        options +
-                        '</select>' +
-                        '</div>' +
-                        '<div class="form-group col-md-3">' +
-                        '<input type="number" class="form-control productQuantity" name="productQuantity[]" required>' +
-                        '</div>' +
-                        '<div class="form-group col-md-1">' +
-                        '<button type="button" class="btn btn-danger removeProduct">-</button>' +
-                        '</div>' +
-                        '</div>';
-                    $('#productsContainer').append(newRow);
-                    
-                    // اعمال Select2 بر روی المان select جدید
-                    $('.select2').select2();
+                    var product = response.product;
+                    var existingProductRow = $('#productsContainer').find('input[value="' + product.productqr + '"]').closest('.productRow');
+                    if(existingProductRow.length > 0) {
+                        // If product already exists in the form, increase its quantity
+                        var quantityInput = existingProductRow.find('.productQuantity');
+                        var currentQuantity = parseInt(quantityInput.val());
+                        var pack = parseInt(product.pack);
+                        var newQuantity = currentQuantity + pack;
+                        quantityInput.val(newQuantity);
+                    } else {
+                        // If product does not exist in the form, add it
+                        var pack = parseInt(product.pack);
+                        var initialQuantity = pack;
+                        var newRow = '<div class="form-row productRow">' +
+                            '<div class="form-group col-md-8">' +
+                            '<input type="text" name="productqrrr[]" value="' + product.productqr + '" hidden>'+
+                            '<input type="text" name="productName[]" class="form-control" required readonly  value="' + product.product_name + '">'+
+                            '</div>' +
+                            '<div class="form-group col-md-3">' +
+                            '<input type="number" class="form-control productQuantity text-center" name="productQuantity[]" value="' + initialQuantity + '" readonly required>' +
+                            '<button type="button" class="btn btn-sm btn-secondary decreaseQuantity">-</button>' +
+                            '</div>' +
+                            '<div class="form-group col-md-1">' +
+                            '<button type="button" class="btn btn-icon btn-danger removeProduct"><i class="fas fa-times"></i></button>' +
+                            '</div>' +
+                            '</div>';
+                        $('#productsContainer').append(newRow);
+                    }
+                    // Clear the product ID field
+                    $('.productID').val('');
+                    // Clear the search field
+                    $('.productID').trigger('change.select2');
                 } else {
                     alert(response.message);
                 }
@@ -215,14 +189,25 @@ $(document).ready(function() {
         });
     });
 
-    // حذف کردن فیلد محصول با کلیک بر روی دکمه حذف
+    // Function to remove product from the form
     $(document).on('click', '.removeProduct', function() {
         $(this).closest('.productRow').remove();
     });
-    
-    // اعمال Select2 بر روی المان‌های موجود در صفحه
-    $('.select2').select2();
+
+    // Function to decrease product quantity
+    $(document).on('click', '.decreaseQuantity', function() {
+        var quantityInput = $(this).siblings('.productQuantity');
+        var newQuantity = parseInt(quantityInput.val()) - 1;
+        if (newQuantity >= 0) {
+            quantityInput.val(newQuantity);
+        }
+        // If quantity becomes zero, remove the product row
+        if (newQuantity === 0) {
+            $(this).closest('.productRow').remove();
+        }
+    });
 });
 
 </script>
+
 <?php require_once '../../../footer.php'; ?>

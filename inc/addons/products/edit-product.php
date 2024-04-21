@@ -17,11 +17,11 @@ if (isset($_POST['update'])) {
     $product_name_new = $_POST['product_name'];//نام محصول اصلاح شده
     $productqr_new = $_POST['productqr'];//شناسه محصول اصلاح شده
     $minStock_new = $_POST['minStock'];//حداقل موجودی اصلاح شده
-
+    $pack_new = $_POST['pack'];
     // اپدیت اطلاعات محصول در دیتابیس
-    $update_query = "UPDATE products SET product_name = ?, productqr = ?, minStock = ? WHERE id = ?";
+    $update_query = "UPDATE products SET product_name = ?, productqr = ?, minStock = ?, pack = ? WHERE id = ?";
     $update_stmt = $connection->prepare($update_query);
-    $update_stmt->bind_param("siii", $product_name_new, $productqr_new, $minStock_new, $product_id);
+    $update_stmt->bind_param("siiii", $product_name_new, $productqr_new, $minStock_new,  $pack_new,$product_id);
 
     if ($update_stmt->execute() === TRUE) {
         $message_data = "محصول با موفقیت ویرایش شد";
@@ -42,6 +42,7 @@ if ($result->num_rows > 0) {
     $product_name = $row['product_name'];
     $productqr = $row['productqr'];
     $minStock = $row['minStock'];
+    $pack = $row['pack'];
 } else {
     // اگر محصول با این آیدی وجود نداشت، پیام خطا نمایش داده شود یا به صفحه دیگری منتقل شود
     // مثلاً به صفحه لیست محصولات
@@ -80,6 +81,10 @@ if ($result->num_rows > 0) {
                         <div class="form-group">
                             <label>بارکد محصول(شناسه)</label>
                             <input type="number" class="form-control" name="productqr" value="<?php echo isset($productqr) ? $productqr : ''; ?>">
+                        </div>
+                        <div class="form-group">
+                        <label>تعداد محصول در هر بسته</label>
+                            <input type="number" class="form-control" name="pack" value="<?php echo isset($pack) ? $pack : ''; ?>">
                         </div>
                         <div class="form-group">
                             <label>حداقل موجودی برای اخطار اتمامی محصول</label>
