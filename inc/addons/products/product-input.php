@@ -62,6 +62,21 @@ $products_result = $connection->query($products_sql);
 
 <div class="main-content">
     <nav class="row">
+    <?php  
+if(!empty($message_sec)){
+?>
+        <div class="col-12 col-md-12 col-lg-12">
+            <div class="alert alert-success alert-dismissible show fade">
+                <div class="alert-body">
+                    <button class="close" data-dismiss="alert">
+                        <span>×</span>
+                    </button>
+                    محصولات با موفقیت وارد شدند
+                </div>
+            </div>
+        </div>
+
+        <?php } ?>
         <div class="col-12 col-md-1 col-lg-1"></div>
         <div class="col-12 col-md-10 col-lg-10">
             <nav class="form-row">
@@ -97,7 +112,7 @@ $products_result = $connection->query($products_sql);
                             </div>
                             <div class="form-group col-md-4">
                                 <label>شناسه ورود</label>
-                                <input type="text" class="form-control" name="id" value="<?php echo jdate("Y/m/d",'','','','en'); ?><?php echo rand(1,9999999); ?>">
+                                <input type="text" class="form-control" name="id" value="<?php echo jdate("Ymd",'','','','en'); ?><?php echo rand(1,9999999); ?>">
                             </div>
                             <div class="form-group col-md-4">
                                 <label>نام فروشنده</label>

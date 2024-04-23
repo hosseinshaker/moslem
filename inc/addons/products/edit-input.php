@@ -1,7 +1,8 @@
 <?php
-$title_page = "ویرایش محصولات وارد شده";
+$title_page = "ویرایش محصولات";
 require_once '../../../header.php';
 
+// Check if form is submitted
 if(isset($_POST['update'])) {
     // Extract form data
     $entry_id = $_POST['entry_id'];
@@ -122,141 +123,139 @@ if(isset($_POST['update'])) {
 }
 
 
-
-
-
-
-
-// Check if id is set
+// Check if form ID is provided
 if(isset($_GET['id'])) {
-    $entry_id = $_GET['id'];
-    
-    // Retrieve products from the database
-    $products_sql = "SELECT * FROM products";
-    $products_result = $connection->query($products_sql);
-    
-    // استخراج اطلاعات محصولات ورودی از دیتابیس
-    $product_input_sql = "SELECT * FROM products_input WHERE id = '$entry_id'";
-    $product_input_result = $connection->query($product_input_sql);
-    
-    if($product_input_result->num_rows > 0) {
-        $product_input_row = $product_input_result->fetch_assoc();
+    $form_id = $_GET['id'];
+
+    // Fetch form data from the database based on the form ID
+    $form_sql = "SELECT * FROM products_input WHERE id = ?";
+    $stmt = $connection->prepare($form_sql);
+    $stmt->bind_param("i", $form_id);
+    $stmt->execute();
+    $form_result = $stmt->get_result();
+
+    if($form_result->num_rows > 0) {
+        $form_row = $form_result->fetch_assoc();
+
+        // Extract form data
+        $entry_date = $form_row['date'];
+        $clock = $form_row['clock'];
+        $entry_id = $form_row['entry_id'];
+        $user_name = $form_row['user'];
+        $foroshande_name = $form_row['foroshande_name'];
+        $foroshande_phone = $form_row['foroshande_phone'];
+        $ranande_name = $form_row['name_ranande'];
+        $ranande_phone = $form_row['phone_ranande'];
+        $ranande_pelak = $form_row['pelak_khodro'];
+        $comment = $form_row['comment'];
+        $product_data_json = $form_row['product_data'];
+
+        // Decode product data JSON
+        $product_data = json_decode($product_data_json, true);
+    } else {
+        // Handle error if form with provided ID is not found
+        echo "فرم مورد نظر یافت نشد.";
+        exit;
+    }
+} else {
+    // Handle error if form ID is not provided
+    echo "شناسه فرم مورد نظر ارسال نشده است.";
+    exit;
+}
+// Retrieve products from the database
+$products_sql = "SELECT * FROM products";
+$products_result = $connection->query($products_sql);
 ?>
 
 <div class="main-content">
     <nav class="row">
-        <?php  
-        if(!empty($message_sec)){
-        ?>
-            <div class="col-12 col-md-12 col-lg-12">
-                <div class="alert alert-success alert-dismissible show fade">
-                    <div class="alert-body">
-                        <button class="close" data-dismiss="alert">
-                            <span>×</span>
-                        </button>
-                        محصولات با موفقیت ویرایش شدند
-                    </div>
-                </div>
-            </div>
-        <?php } ?>
         <div class="col-12 col-md-1 col-lg-1"></div>
         <div class="col-12 col-md-10 col-lg-10">
-            <form method="post" id="productForm">
-            <input type="hidden" name="entry_id" value="<?php echo $product_input_row['entry_id']; ?>">
+            <nav class="form-row">
+                <div class="card">
+                    <div class="card-header">
+                        <h6>شناسه کالا را وارد کنید</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="col-md-12 form-group">
+                            <input type="number" class="form-control productID" placeholder="شناسه محصول را وارد کنید">
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <form method="post">
+            <input type="hidden" name="entry_id" value="<?php echo $entry_id; ?>">
                 <div class="card">
                     <div class="card-header">
                         <h4><?php echo $title_page;?></h4>
                     </div>
                     <div class="card-body">
                         <div id="productsContainer">
+                            <!-- Existing products will be appended here -->
                             <?php
-                            // استخراج اطلاعات محصولات ورودی از دیتابیس
-                            $products_input_sql = "SELECT * FROM products_input WHERE id = '$entry_id'";
-                            $products_input_result = $connection->query($products_input_sql);
-                            
-                            if($products_input_result->num_rows > 0) {
-                                $products_input_row = $products_input_result->fetch_assoc();
-                                // تبدیل داده‌های JSON به آرایه
-                                $products_data = json_decode($products_input_row['product_data'], true);
-                                // تعداد محصولات ورودی
-                                $product_count = count($products_data);
-                                
-                                if($product_count > 0) {
-                                    foreach($products_data as $product) {
-                                        ?>
-                                        <div class="form-row productRow">
-                                            <div class="form-group col-md-8">
-                                                <label>نام محصول و یا بارکد</label>
-                                                <select name="productName[]" class="form-control select2" required>
-                                                    <?php
-                                                    // نمایش گزینه‌های محصولات
-                                                    foreach ($products_result as $product_row) {
-                                                        $selected = ($product['productqr'] == $product_row['productqr']) ? 'selected' : '';
-                                                        echo '<option value="' . $product_row['productqr'] . '" ' . $selected . '>' . $product_row['product_name'] . ' کد: ' . $product_row['productqr'] . '</option>';
-                                                    }
-                                                    ?>
-                                                </select>
-                                            </div>
-                                            <div class="form-group col-md-3">
-                                                <label for="productQuantity">تعداد</label>
-                                                <input type="number" class="form-control productQuantity" name="productQuantity[]" value="<?php echo $product['quantity']; ?>" required>
-                                            </div>
-                                            <div class="form-group col-md-1">
-                                                <button type="button" class="btn btn-danger removeProduct">-</button>
-                                            </div>
-                                        </div>
-                                        <?php
-                                    }
-                                } else {
-                                    echo "<p>هیچ محصولی وارد نشده است.</p>";
+                            if(!empty($product_data)) {
+                                foreach($product_data as $product) {
+                                    echo '<div class="form-row productRow">' .
+                                        '<div class="form-group col-md-8">' .
+                                        '<input type="text" name="productqrrr[]" value="' . $product['productqr'] . '" hidden>' .
+                                        '<input type="text" name="productName[]" class="form-control" required readonly value="' . $product['product_name'] . '">' .
+                                        '</div>' .
+                                        '<div class="form-group col-md-3">' .
+                                        '<input type="number" class="form-control productQuantity text-center" name="productQuantity[]" value="' . $product['quantity'] . '" readonly required>' .
+                                        '<button type="button" class="btn btn-sm btn-secondary decreaseQuantity">-</button>' .
+                                        '</div>' .
+                                        '<div class="form-group col-md-1">' .
+                                        '<button type="button" class="btn btn-icon btn-danger removeProduct"><i class="fas fa-times"></i></button>' .
+                                        '</div>' .
+                                        '</div>';
                                 }
-                            } else {
-                                echo "<p>هیچ محصولی وارد نشده است.</p>";
                             }
                             ?>
                         </div>
-                        <div id="productControls">
-                            <button type="button" class="btn btn-success addProduct"> افزودن محصول </button>
-                        </div>
                         <div class="form-row">
-                        <div class="form-group col-md-4">
+                            <div class="form-group col-md-4">
                                 <label>تاریخ ورود:</label>
-                                <input id="datepicker-check-in"  type="text" class="form-control" name="entry_date" value="<?php echo $product_input_row['date']; ?>" required>
+                                <input id="datepicker-check-in" name="entry_date" class="form-control" required value="<?php echo $entry_date; ?>">
                             </div>
                             <div class="form-group col-md-4">
-                                <label>ساعت:</label>
-                                <input type="text" class="form-control" name="clock" value="<?php echo $product_input_row['clock']; ?>" required>
+                                <label>ساعت</label>
+                                <input type="text" class="form-control" name="clock" value="<?php echo $clock; ?>">
                             </div>
                             <div class="form-group col-md-4">
-                                <label>کاربر:</label>
-                                <input type="text" class="form-control" name="user" value="<?php echo $product_input_row['user']; ?>" required>
+                                <label>شناسه ورود</label>
+                                <input type="text" class="form-control" name="id" value="<?php echo $entry_id; ?>" readonly>
                             </div>
                             <div class="form-group col-md-4">
-                                <label>نام فروشنده:</label>
-                                <input type="text" class="form-control" name="foroshande_name" value="<?php echo $product_input_row['foroshande_name']; ?>" required>
+                                <label>نام فروشنده</label>
+                                <input type="text" class="form-control" name="foroshande_name" placeholder="نام فروشنده را وارد کنید" value="<?php echo $foroshande_name; ?>">
                             </div>
                             <div class="form-group col-md-4">
-                                <label>شماره تماس فروشنده:</label>
-                                <input type="number" class="form-control" name="foroshande_phone" value="<?php echo $product_input_row['foroshande_phone']; ?>" required>
+                                <label>شماره تماس فروشنده</label>
+                                <input type="number" class="form-control" name="foroshande_phone" placeholder="شماره فروشنده را وارد کنید" value="<?php echo $foroshande_phone; ?>">
                             </div>
                             <div class="form-group col-md-4">
-                                <label>نام راننده:</label>
-                                <input type="text" class="form-control" name="name_ranande" value="<?php echo $product_input_row['name_ranande']; ?>" required>
+                                <label>نام راننده</label>
+                                <input type="text" class="form-control" name="ranande_name" placeholder="نام راننده را وارد کنید" value="<?php echo $ranande_name; ?>">
                             </div>
                             <div class="form-group col-md-4">
-                                <label>شماره تماس راننده:</label>
-                                <input type="number" class="form-control" name="phone_ranande" value="<?php echo $product_input_row['phone_ranande']; ?>" required>
+                                <label>شماره تماس راننده</label>
+                                <input type="number" class="form-control" name="ranande_phone" placeholder="شماره تماس راننده را وارد کنید" value="<?php echo $ranande_phone; ?>">
                             </div>
                             <div class="form-group col-md-4">
-                                <label>شماره پلاک خودرو:</label>
-                                <input type="text" class="form-control" name="pelak_khodro" value="<?php echo $product_input_row['pelak_khodro']; ?>" required>
+                                <label>شماره پلاک خودرو</label>
+                                <input type="text" class="form-control text-center" name="ranande_pelak" placeholder="شماره پلاک خودرو را وارد کنید" value="<?php echo $ranande_pelak; ?>">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label>کاربر ثبت کننده</label>
+                                <input type="text" class="form-control text-center" name="user" placeholder=" نام ثبت کننده فرم " value="<?php echo $user_name; ?>">
                             </div>
                             <div class="form-group col-md-12">
-                                <label>توضیحات:</label>
-                                <textarea name="comment" class="form-control"><?php echo $product_input_row['comment']; ?></textarea>
-                            </div>
+                                <label>توضیحات</label>
+                                <textarea name="comment" class="form-control"><?php echo $comment; ?></textarea>
+                            </div>               
                         </div>
-                        <button type="submit" class="btn btn-primary" name="update">به‌روزرسانی محصول</button>
+                        <input type="submit" class="btn btn-primary" name="update" id="insertButton" value=" بروزرسانی  "> 
                     </div>
                 </div>
             </form>
@@ -267,44 +266,50 @@ if(isset($_GET['id'])) {
 
 <!-- jQuery library -->
 <script src="<?php echo $base_url; ?>/assets/js/jquery-3.6.0.min.js"></script>
-
-<!-- Custom script -->
 <script>
-$(document).ready(function() {
-    // افزودن فیلد محصول با کلیک بر روی دکمه افزودن
-    $(document).on('click', '.addProduct', function() {
-        // ارسال درخواست AJAX به صفحه ajax.php
+   $(document).ready(function() {
+    // Function to handle product search and addition
+    $('.productID').on('change', function() {
+        var productID = $(this).val();
         $.ajax({
-            url: 'ajax.php',
-            method: 'GET',
+            url: 'search_product.php', // Replace with actual URL for product search
+            method: 'POST',
             dataType: 'json',
+            data: { productID: productID },
             success: function(response) {
                 if (response.success) {
-                    var products = response.products;
-                    // افزودن داده‌های محصولات به تگ select
-                    var options = '';
-                    products.forEach(function(product) {
-                        options += '<option value="' + product.productqr + '">' + product.product_name + ' کد: ' + product.productqr + '</option>';
-                    });
-                    // اضافه کردن فیلد محصول به فرم
-                    var newRow = '<div class="form-row productRow">' +
-                        '<div class="form-group col-md-8">' +
-                        '<select name="productName[]" class="form-control select2" required>' +
-                        '<option value="">انتخاب</option>' +
-                        options +
-                        '</select>' +
-                        '</div>' +
-                        '<div class="form-group col-md-3">' +
-                        '<input type="number" class="form-control productQuantity" name="productQuantity[]" required>' +
-                        '</div>' +
-                        '<div class="form-group col-md-1">' +
-                        '<button type="button" class="btn btn-danger removeProduct">-</button>' +
-                        '</div>' +
-                        '</div>';
-                    $('#productsContainer').append(newRow);
-                    
-                    // اعمال Select2 بر روی المان select جدید
-                    $('.select2').select2();
+                    var product = response.product;
+                    var existingProductRow = $('#productsContainer').find('input[value="' + product.productqr + '"]').closest('.productRow');
+                    if(existingProductRow.length > 0) {
+                        // If product already exists in the form, increase its quantity
+                        var quantityInput = existingProductRow.find('.productQuantity');
+                        var currentQuantity = parseInt(quantityInput.val());
+                        var pack = parseInt(product.pack);
+                        var newQuantity = currentQuantity + pack;
+                        quantityInput.val(newQuantity);
+                    } else {
+                        // If product does not exist in the form, add it
+                        var pack = parseInt(product.pack);
+                        var initialQuantity = pack;
+                        var newRow = '<div class="form-row productRow">' +
+                            '<div class="form-group col-md-8">' +
+                            '<input type="text" name="productqrrr[]" value="' + product.productqr + '" hidden>'+
+                            '<input type="text" name="productName[]" class="form-control" required readonly  value="' + product.product_name + '">'+
+                            '</div>' +
+                            '<div class="form-group col-md-3">' +
+                            '<input type="number" class="form-control productQuantity text-center" name="productQuantity[]" value="' + initialQuantity + '" readonly required>' +
+                            '<button type="button" class="btn btn-sm btn-secondary decreaseQuantity">-</button>' +
+                            '</div>' +
+                            '<div class="form-group col-md-1">' +
+                            '<button type="button" class="btn btn-icon btn-danger removeProduct"><i class="fas fa-times"></i></button>' +
+                            '</div>' +
+                            '</div>';
+                        $('#productsContainer').append(newRow);
+                    }
+                    // Clear the product ID field
+                    $('.productID').val('');
+                    // Clear the search field
+                    $('.productID').trigger('change.select2');
                 } else {
                     alert(response.message);
                 }
@@ -315,22 +320,26 @@ $(document).ready(function() {
         });
     });
 
-    // حذف کردن فیلد محصول با کلیک بر روی دکمه حذف
+    // Function to remove product from the form
     $(document).on('click', '.removeProduct', function() {
         $(this).closest('.productRow').remove();
     });
-    
-    // اعمال Select2 بر روی المان‌های موجود در صفحه
-    $('.select2').select2();
+
+    // Function to decrease product quantity
+    $(document).on('click', '.decreaseQuantity', function() {
+        var quantityInput = $(this).siblings('.productQuantity');
+        var newQuantity = parseInt(quantityInput.val()) - 1;
+        if (newQuantity >= 0) {
+            quantityInput.val(newQuantity);
+        }
+        // If quantity becomes zero, remove the product row
+        if (newQuantity === 0) {
+            $(this).closest('.productRow').remove();
+        }
+    });
 });
 
 </script>
-<?php
-    } else {
-        echo "<p>محصول ورودی با این شناسه یافت نشد.</p>";
-    }
-} else {
-    echo "<p>شناسه محصول ورودی مشخص نشده است.</p>";
-}
-require_once '../../../footer.php';
-?>
+
+<?php require_once '../../../footer.php'; ?>
+ 
