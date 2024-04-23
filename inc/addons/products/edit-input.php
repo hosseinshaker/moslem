@@ -11,116 +11,150 @@ if(isset($_POST['update'])) {
     $user = $_POST['user'];
     $foroshande_name = $_POST['foroshande_name'];
     $foroshande_phone = $_POST['foroshande_phone'];
-    $name_ranande = $_POST['name_ranande'];
-    $phone_ranande = $_POST['phone_ranande'];
-    $pelak_khodro = $_POST['pelak_khodro'];
+    $name_ranande = $_POST['ranande_name']; // Updated field name
+    $phone_ranande = $_POST['ranande_phone']; // Updated field name
+    $pelak_khodro = $_POST['ranande_pelak']; // Updated field name
     $comment = $_POST['comment'];
+    
+    // Fetch product data from the database for the current entry
+    $products_input_sql = "SELECT product_data FROM products_input WHERE entry_id = '$entry_id'";
+    $products_input_result = $connection->query($products_input_sql);
+    $row = $products_input_result->fetch_assoc();
+    $db_products_data = json_decode($row['product_data'], true);
+
+    // Prepare the product data from the form
+    $form_products_data = [];
+    $productqrrr = $_POST['productqrrr']; // Array of productqr IDs
+    $productNames = $_POST['productName']; // Array of product names
+    $productQuantities = $_POST['productQuantity']; // Array of quantities
+
+    for($i = 0; $i < count($productqrrr); $i++) {
+        $product_data = [
+            "product_id" => "", // Set the product ID if needed
+            "product_name" => $productNames[$i],
+            "productqr" => $productqrrr[$i],
+            "quantity" => $productQuantities[$i]
+        ];
+        // Push product data to the form_products_data array
+        $form_products_data[] = $product_data;
+    }
+
+    // Compare the products from the form with the products from the database
+    $added_products = [];
+    $removed_products = [];
+    $changed_quantity_products = [];
+
+    // Find added and removed products
+    foreach ($db_products_data as $db_product) {
+        $found = false;
+        foreach ($form_products_data as $form_product_key => $form_product) {
+            if ($form_product['productqr'] === $db_product['productqr']) {
+                $found = true;
+                // Check if quantity has changed
+                $quantity_difference = $form_product['quantity'] - $db_product['quantity'];
+                if ($quantity_difference != 0) {
+                    // Update the product quantity in the form data
+                    $db_products_data[$form_product_key]['quantity'] = $form_product['quantity'];
+                    // Update the product stock in the database
+                    $productqr = $form_product['productqr'];
+                    $update_stock_sql = "UPDATE products SET stock = stock + $quantity_difference WHERE productqr = '$productqr'";
+                    $connection->query($update_stock_sql);
+                    // Add product to changed quantity products list
+                    $changed_quantity_products[] = $form_product['product_name'];
+                }
+                break;
+            }
+        }
+        if (!$found) {
+            // Product is removed
+            $removed_products[] = $db_product['product_name'];
+            // Reduce product stock in the database
+            $productqr = $db_product['productqr'];
+            $quantity = $db_product['quantity'];
+            $update_stock_sql = "UPDATE products SET stock = stock - $quantity WHERE productqr = '$productqr'";
+            $connection->query($update_stock_sql);
+        }
+    }
+    
+
+    foreach ($form_products_data as $form_product) {
+        $found = false;
+        foreach ($db_products_data as &$db_product) {
+            if ($form_product['productqr'] === $db_product['productqr']) {
+                $found = true;
+                // Check if quantity has changed
+                $quantity_difference = $form_product['quantity'] - $db_product['quantity'];
+                if ($quantity_difference != 0) {
+                    // Update the product quantity in the form data
+                    $db_product['quantity'] = $form_product['quantity'];
+                    // Update the product stock in the database
+                    $productqr = $form_product['productqr'];
+                    $update_stock_sql = "UPDATE products SET stock = stock + $quantity_difference WHERE productqr = '$productqr'";
+                    $connection->query($update_stock_sql);
+                    // Add product to changed quantity products list
+                    $changed_quantity_products[] = $form_product['product_name'];
+                }
+                break;
+            }
+        }
+        if (!$found) {
+            // Product is added
+            $added_products[] = $form_product['product_name'];
+            // Add new product to the database
+            $productqr = $form_product['productqr'];
+            $quantity = $form_product['quantity'];
+            $update_stock_sql = "UPDATE products SET stock = stock + $quantity WHERE productqr = '$productqr'";
+            $connection->query($update_stock_sql);
+        }
+    }
+
+    // Display added products
+    if (!empty($added_products)) {
+        echo "محصولات اضافه شده:";
+        echo "<ul>";
+        foreach ($added_products as $product) {
+            echo "<li>$product</li>";
+        }
+        echo "</ul>";
+    }
+
+    // Display removed products
+    if (!empty($removed_products)) {
+        echo "محصولات حذف شده:";
+        echo "<ul>";
+        foreach ($removed_products as $product) {
+            echo "<li>$product</li>";
+        }
+        echo "</ul>";
+    }
+
+    // Display products with changed quantity
+    if (!empty($changed_quantity_products)) {
+        echo "محصولات با تغییر تعداد:";
+        echo "<ul>";
+        foreach ($changed_quantity_products as $product) {
+            echo "<li>$product</li>";
+        }
+        echo "</ul>";
+    }
 
     // Update entry in database
     $update_sql = "UPDATE products_input SET date = '$entry_date', clock = '$clock', user = '$user', foroshande_name = '$foroshande_name', foroshande_phone = '$foroshande_phone', name_ranande = '$name_ranande', phone_ranande = '$phone_ranande', pelak_khodro = '$pelak_khodro', comment = '$comment' WHERE entry_id = '$entry_id'";
     $connection->query($update_sql);
 
-    // استخراج اطلاعات محصولات ورودی از دیتابیس
-    $products_input_sql = "SELECT * FROM products_input WHERE entry_id = '$entry_id'";
-    $products_input_result = $connection->query($products_input_sql);
+    // Prepare the product data JSON
+    $products_data_json = json_encode($form_products_data, JSON_UNESCAPED_UNICODE);
 
-    if($products_input_result->num_rows > 0) {
-        $products_input_row = $products_input_result->fetch_assoc();
-        // تبدیل داده‌های JSON به آرایه
-        $products_data_db = json_decode($products_input_row['product_data'], true);
+    // Update product_data column in the database
+    $update_products_sql = "UPDATE products_input SET product_data = '$products_data_json' WHERE entry_id = '$entry_id'";
+    $connection->query($update_products_sql);
 
-        // محصولاتی که از فرم ارسال شده است
-        $products_form = $_POST['productName']; // نام محصولات ارسال شده از فرم
-        $quantities_form = $_POST['productQuantity']; // مقادیر محصولات ارسال شده از فرم
-
-        // مقدار موجودی محصولات قبل از ارسال فرم
-        $previous_quantities = array_column($products_data_db, 'quantity');
-
-        // محصولاتی که از دیتابیس حذف شده اما در فرم موجود نیستند
-        $deleted_products = array_diff(array_column($products_data_db, 'productqr'), $products_form);
-
-        // کاهش موجودی محصولات حذف شده از فرم
-        foreach($deleted_products as $deleted_product) {
-            // حذف محصول از آرایه محصولات و مقادیر آن
-            $key = array_search($deleted_product, array_column($products_data_db, 'productqr'));
-            unset($products_data_db[$key]);
-
-            // دریافت مقدار موجودی انبار برای محصول از دیتابیس
-            $inventory_query = "SELECT stock FROM products WHERE productqr = '$deleted_product'";
-            $inventory_result = $connection->query($inventory_query);
-
-            if($inventory_result->num_rows > 0) {
-                $inventory_row = $inventory_result->fetch_assoc();
-                $inventory_stock = $inventory_row['stock'];
-
-                // دریافت مقدار موجودی قبل از حذف از دیتابیس
-                $previous_quantity = $previous_quantities[$key];
-
-                // بررسی موجودی انبار قبل از کسر مقدار
-                if($inventory_stock >= $previous_quantity) {
-                    // انجام عملیات کاهش موجودی
-                    $update_inventory_sql = "UPDATE products SET stock = stock - $previous_quantity WHERE productqr = '$deleted_product'";
-                    $connection->query($update_inventory_sql);
-                } else {
-                    // پیام به کاربر در صورت کمبود موجودی انبار
-                    echo "موجودی انبار برای محصول $deleted_product کافی نیست و حذف محصول امکان پذیر نیست.<br>";
-                }
-            }
-        }
-
-        // بررسی تعداد محصولات ارسال شده از فرم و مقایسه با دیتابیس و کاهش موجودی محصولات
-        foreach($products_form as $index => $product) {
-            // بررسی آیا محصول در دیتابیس وجود دارد یا نه
-            $inventory_query = "SELECT stock FROM products WHERE productqr = '$product'";
-            $inventory_result = $connection->query($inventory_query);
-
-            if($inventory_result->num_rows > 0) {
-                // در صورت وجود محصول در دیتابیس
-                $inventory_row = $inventory_result->fetch_assoc();
-                $inventory_stock = $inventory_row['stock'];
-
-                // دریافت مقدار موجودی قبل از ارسال فرم
-                $previous_quantity = $previous_quantities[$index];
-
-                // مقدار محصول ارسال شده از فرم
-                $quantity_form = $quantities_form[$index];
-
-                // بررسی موجودی انبار قبل از کسر مقدار
-                if($inventory_stock >= $previous_quantity) {
-                    // محاسبه تفاوت مقدار جدید با مقدار قبلی
-                    $quantity_diff = $previous_quantity - $quantity_form;
-                    // اگر مقدار جدید کمتر از مقدار قبلی بود
-                    if($quantity_diff > 0) {
-                        // انجام عملیات کاهش موجودی
-                        $update_inventory_sql = "UPDATE products SET stock = stock - $quantity_diff WHERE productqr = '$product'";
-                        $connection->query($update_inventory_sql);
-                    } elseif($quantity_diff < 0) { // اگر مقدار جدید بیشتر از مقدار قبلی بود
-                        // انجام عملیات افزایش موجودی
-                        $update_inventory_sql = "UPDATE products SET stock = stock + " . abs($quantity_diff) . " WHERE productqr = '$product'";
-                        $connection->query($update_inventory_sql);
-                    }
-                } else {
-                    // پیام به کاربر در صورت کمبود موجودی انبار
-                    echo "موجودی انبار برای محصول $product کافی نیست و بروزرسانی موجودی امکان پذیر نیست.<br>";
-                }
-            } else {
-                // اگر محصول در دیتابیس وجود نداشته باشد
-                echo "محصول $product در دیتابیس وجود ندارد و بنابراین امکان بروزرسانی موجودی انبار وجود ندارد.<br>";
-            }
-        }
-
-        // آپدیت محتوای جدول products_input
-        $products_data_json = json_encode($products_data_db);
-        $update_products_input_sql = "UPDATE products_input SET product_data = '$products_data_json' WHERE entry_id = '$entry_id'";
-        $connection->query($update_products_input_sql);
-
-        // پیام در صورت موفقیت آمیز بودن به‌روزرسانی
-        echo "<p>اطلاعات با موفقیت به‌روزرسانی شد.</p>";
-    } else {
-        echo "<p>هیچ محصولی وارد نشده است.</p>";
-    }
+    // Message indicating successful update
     $message_sec = true;
 }
+
+
+
 
 
 // Check if form ID is provided
