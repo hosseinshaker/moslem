@@ -1,5 +1,5 @@
 <?php
-$title_page = "خروج محصول از انبار";
+$title_page = "خروج محصولات از انبار";
 require_once '../../../header.php';
 
 // Check if the form is submitted
@@ -7,36 +7,29 @@ if(isset($_POST['exit'])) {
     // Initialize an empty array to store product data
     $products_data = array();
 
-    // Flag to track if any product has insufficient stock
-    $insufficient_stock = false;
-
-
-
-    // Check if all requested quantities are available in stock
-    foreach($_POST['productName'] as $key => $product_name) {
-        // Get product details from the database based on the product name or barcode
-        $product_sql = "SELECT * FROM products WHERE productqr = '$product_name'";
+    // Check if all products have sufficient quantity in stock
+    $all_products_available = true;
+    foreach ($_POST['productqrrr'] as $key => $product_name) {
+        $required_quantity = $_POST['productQuantity'][$key];
+        $product_sql = "SELECT stock FROM products WHERE productqr = '$product_name'";
         $product_result = $connection->query($product_sql);
-        
-        if($product_result->num_rows > 0) {
+        if ($product_result->num_rows > 0) {
             $product_row = $product_result->fetch_assoc();
-            
-            // Check if requested quantity is available
-            $requested_quantity = $_POST['productQuantity'][$key];
-            $current_quantity = $product_row['stock'];
-
-            if($requested_quantity > $current_quantity) {
-                // Set flag to true if any product has insufficient stock
-                $insufficient_stock = true;
-                break; // Exit the loop if any product has insufficient stock
+            $available_quantity = $product_row['stock'];
+            if ($required_quantity > $available_quantity) {
+                // Product quantity in stock is less than required quantity
+                $all_products_available = false;
+                // Notify the user about insufficient stock
+                $insufficient_product_name = $product_name; // You can use this variable to display the product name in the notification message
+                break; // Exit the loop early since at least one product is not available in sufficient quantity
             }
         }
     }
 
-    // If all requested quantities are available, proceed with the exit process
-    if (!$insufficient_stock) {
-        // Deduct quantities from the inventory and update product quantities
-        foreach($_POST['productName'] as $key => $product_name) {
+    if ($all_products_available) {
+        // Proceed with reducing product quantity in stock and inserting the report
+        // Iterate through each submitted product
+        foreach ($_POST['productqrrr'] as $key => $product_name) {
             // Get product details from the database based on the product name or barcode
             $product_sql = "SELECT * FROM products WHERE productqr = '$product_name'";
             $product_result = $connection->query($product_sql);
@@ -44,129 +37,124 @@ if(isset($_POST['exit'])) {
             if($product_result->num_rows > 0) {
                 $product_row = $product_result->fetch_assoc();
                 
-                // Get requested quantity
-                $requested_quantity = $_POST['productQuantity'][$key];
-
-                // Update product quantity in the products table
-                $new_quantity = $product_row['stock'] - $requested_quantity;
-                $update_sql = "UPDATE products SET stock = $new_quantity WHERE id = " . $product_row['id'];
-                $connection->query($update_sql);
                 // Construct product data array
                 $product_data = array(
                     'product_id' => $product_row['id'],
                     'product_name' => $product_row['product_name'],
                     'productqr' => $product_row['productqr'],
-                    'quantity' => $requested_quantity
+                    'quantity' => $_POST['productQuantity'][$key]
                 );
+
                 // Add product data to the main array
                 $products_data[] = $product_data;
+
+                // Update product quantity in the products table
+                $new_quantity = $product_row['stock'] - $_POST['productQuantity'][$key];
+                $update_sql = "UPDATE products SET stock = $new_quantity WHERE id = " . $product_row['id'];
+                $connection->query($update_sql);
             }
         }
+
         // Convert product data array to JSON format
-        $json_data = json_encode($products_data, JSON_UNESCAPED_UNICODE);        // Insert JSON data into the exit reports table
-        $exit_date = $_POST['exitDate'];
+        $json_data = json_encode($products_data, JSON_UNESCAPED_UNICODE);
+
+        // Insert JSON data into the reports table
+        $entry_date = $_POST['entryDate'];
         $clock = $_POST['clock'];
-        $exit_id = $_POST['id'];
+        $exit_id = $_POST['exit_id'];
         $user_name=$_SESSION["username"];
-        $kharidar_name=$_POST["kharidar_name"];
+        $kharidar_name=$_POST["kharidar_name"];//kharidar
         $kharidar_phone=$_POST["kharidar_phone"];
         $ranande_name=$_POST["ranande_name"];
         $ranande_phone=$_POST["ranande_phone"];
         $ranande_pelak=$_POST["ranande_pelak"];
-        $bargekhoroj=$_POST["bargekhoroj"];
+        $bargkhoroj=$_POST["bargkhoroj"];
         $comment=$_POST["comment"];
-        $insert_sql = "INSERT INTO products_output (exit_id, date, clock, product_data,user,kharidar_name,kharidar_phone,name_ranande,phone_ranande,pelak_khodro,shomareh_bargkhoroj,comment) VALUES ('$exit_id', '$exit_date', '$clock', '$json_data', '$user_name','$kharidar_name','$kharidar_phone','$ranande_name','$ranande_phone','$ranande_pelak','$bargekhoroj','$comment')";
+        $insert_sql = "INSERT INTO products_output (exit_id, date, clock, product_data,user,user_edited,comment,name_ranande,phone_ranande,pelak_khodro,kharidar_name,kharidar_phone,shomareh_bargkhoroj) VALUES ('$exit_id', '$entry_date', '$clock', '$json_data', '$user_name','$user_name','$comment','$ranande_name','$ranande_phone','$ranande_pelak','$kharidar_name','$kharidar_phone','$bargkhoroj')";
         $connection->query($insert_sql);
 
         // Show success message
-        $message_sec = true;
+        $message_sec="true";
     } else {
-        // Show error message for insufficient stock
-        $error_message = "مقدار خواسته شده برای یک یا چند محصول بیشتر از مقدار موجود در انبار است.";
+        // Notify the user about insufficient stock
+        $mess_err= "موجودی محصول با شناسه $insufficient_product_name کافی نیست.";
     }
 }
+
 
 // Retrieve products from the database
 $products_sql = "SELECT * FROM products";
 $products_result = $connection->query($products_sql);
 ?>
 
-
 <div class="main-content">
     <nav class="row">
-        <?php if(!empty($message_sec)) { ?>
-            <div class="col-12 col-md-12 col-lg-12">
-                <div class="alert alert-success alert-dismissible show fade">
-                    <div class="alert-body">
-                        <button class="close" data-dismiss="alert">
-                            <span>×</span>
-                        </button>
-                        محصولات با موفقیت از انبار خارج شدند
-                    </div>
+    <?php  
+if(!empty($message_sec)){
+?>
+        <div class="col-12 col-md-12 col-lg-12">
+            <div class="alert alert-success alert-dismissible show fade">
+                <div class="alert-body">
+                    <button class="close" data-dismiss="alert">
+                        <span>×</span>
+                    </button>
+                    محصولات با موفقیت از انبار خارج شدند
                 </div>
             </div>
+        </div>
+
         <?php } ?>
-        <?php if(isset($error_message)) { ?>
-            <div class="col-12 col-md-12 col-lg-12">
-                <div class="alert alert-danger alert-dismissible show fade">
-                    <div class="alert-body">
-                        <button class="close" data-dismiss="alert">
-                            <span>×</span>
-                        </button>
-                        <?php echo $error_message; ?>
-                    </div>
+        <?php  
+if(!empty($mess_err)){
+?>
+        <div class="col-12 col-md-12 col-lg-12">
+            <div class="alert alert-danger alert-dismissible show fade">
+                <div class="alert-body">
+                    <button class="close" data-dismiss="alert">
+                        <span>×</span>
+                    </button>
+                    <?php echo $mess_err; ?>
                 </div>
             </div>
+        </div>
+
         <?php } ?>
         <div class="col-12 col-md-1 col-lg-1"></div>
         <div class="col-12 col-md-10 col-lg-10">
-            <form method="post" id="exitForm">
+            <nav class="form-row">
+                <div class="card">
+                    <div class="card-header">
+                        <h6>شناسه کالا را وارد کنید</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="col-md-12 form-group">
+                            <input type="number" class="form-control productID" placeholder="شناسه محصول را وارد کنید" id="searchInput">
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <form method="post">
                 <div class="card">
                     <div class="card-header">
                         <h4><?php echo $title_page;?></h4>
                     </div>
                     <div class="card-body">
                         <div id="productsContainer">
-                            <div class="form-row productRow">
-                                <div class="form-group col-md-8">
-                                    <label>نام محصول و یا بارکد</label>
-                                    <select name="productName[]" class="form-control select2" required>
-                                        <option value="">انتخاب</option>
-                                        <?php
-                                        if ($products_result->num_rows > 0) {
-                                            while ($products_row = $products_result->fetch_assoc()) {
-                                                echo '<option value="' . $products_row['productqr'] . '">' . $products_row['product_name'] .' کد: '.$products_row['productqr'] . '</option>';
-                                            }
-                                        } else {
-                                            echo "<option value=''>نتیجه‌ای یافت نشد</option>";
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
-                                <div class="form-group col-md-3">
-                                    <label for="productQuantity">تعداد</label>
-                                    <input type="number" class="form-control productQuantity" name="productQuantity[]" required>
-                                </div>
-                                <div class="form-group col-md-1">
-                                    <button type="button" class="btn btn-danger removeProduct">-</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="productControls">
-                            <button type="button" class="btn btn-success addProduct"> افزودن محصول </button>
+                            <!-- Existing products will be appended here -->
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-4">
                                 <label>تاریخ خروج:</label>
-                                <input id="datepicker-check-out" name="exitDate" class="form-control" required>
+                                <input id="datepicker-check-in" name="entryDate" class="form-control" required value="<?php echo jdate("Y/m/d",'','','','en'); ?>">
                             </div>
                             <div class="form-group col-md-4">
-                                <label>ساعت خروج</label>
-                                <input type="text" class="form-control" name="clock" value="<?php echo jdate("H:i"); ?>">
+                                <label>ساعت</label>
+                                <input type="text" class="form-control" name="clock" value="<?php echo jdate("H:i",'','','','en'); ?>">
                             </div>
                             <div class="form-group col-md-4">
                                 <label>شناسه خروج</label>
-                                <input type="text" class="form-control" name="id" value="<?php echo rand(100,999999999999999999); ?>">
+                                <input type="text" class="form-control" name="exit_id" value="<?php echo jdate("Ymd",'','','','en'); ?><?php echo rand(1,9999999); ?>">
                             </div>
                             <div class="form-group col-md-4">
                                 <label>نام خریدار</label>
@@ -178,28 +166,26 @@ $products_result = $connection->query($products_sql);
                             </div>
                             <div class="form-group col-md-4">
                                 <label>نام راننده</label>
-                                <input type="text" class="form-control" name="ranande_name" placeholder="نام راننده را وارد کنید">
+                                <input type="text" class="form-control" name="ranande_name" placeholder="نام راننده را وارد کنید" value="علی کشاورز">
                             </div>
                             <div class="form-group col-md-4">
                                 <label>شماره تماس راننده</label>
-                                <input type="number" class="form-control" name="ranande_phone" placeholder="شماره تماس راننده را وارد کنید">
+                                <input type="number" class="form-control" name="ranande_phone" placeholder="شماره تماس راننده را وارد کنید" value="09171393541">
                             </div>
                             <div class="form-group col-md-4">
                                 <label>شماره پلاک خودرو</label>
-                                <input type="text" class="form-control" name="ranande_pelak" placeholder="شماره پلاک خودرو را وارد کنید">
+                                <input type="text" class="form-control text-center" name="ranande_pelak" placeholder="شماره پلاک خودرو را وارد کنید" value="77ل222 ایران 93">
                             </div>
                             <div class="form-group col-md-4">
-                                <label>شماره برگه خروج</label>
-                                <input type="number" class="form-control" name="bargekhoroj" placeholder="شماره برگه خروج را وارد کنید">
+                                <label> شماره برگه خروج </label>
+                                <input type="text" class="form-control text-center" name="bargkhoroj" placeholder="شماره برگه خروج را وارد کنید">
                             </div>
                             <div class="form-group col-md-12">
                                 <label>توضیحات</label>
-                             
                                 <textarea name="comment" class="form-control"></textarea>
                             </div>               
-
                         </div>
-                        <button type="submit" class="btn btn-primary" name="exit">خروج محصولات از انبار</button>
+                        <input type="submit" class="btn btn-primary" name="exit" id="exitButton" value="خروج محصولات از انبار"> 
                     </div>
                 </div>
             </form>
@@ -209,45 +195,51 @@ $products_result = $connection->query($products_sql);
 </div>
 
 <!-- jQuery library -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
-<!-- Custom script -->
+<script src="<?php echo $base_url; ?>/assets/js/jquery-3.6.0.min.js"></script>
 <script>
-$(document).ready(function() {
-    // Add product field with click on add button
-    $(document).on('click', '.addProduct', function() {
-        // Send AJAX request to ajax.php
+   $(document).ready(function() {
+    // Function to handle product search and addition
+    $('.productID').on('change', function() {
+        var productID = $(this).val();
         $.ajax({
-            url: 'ajax.php',
-            method: 'GET',
+            url: 'search_product.php', // Replace with actual URL for product search
+            method: 'POST',
             dataType: 'json',
+            data: { productID: productID },
             success: function(response) {
                 if (response.success) {
-                    var products = response.products;
-                    // Add products data to select tag
-                    var options = '';
-                    products.forEach(function(product) {
-                        options += '<option value="' + product.productqr + '">' + product.product_name + ' کد: ' + product.productqr + '</option>';
-                    });
-                    // Add product field to the form
-                    var newRow = '<div class="form-row productRow">' +
-                        '<div class="form-group col-md-8">' +
-                        '<select name="productName[]" class="form-control select2" required>' +
-                        '<option value="">انتخاب</option>' +
-                        options +
-                        '</select>' +
-                        '</div>' +
-                        '<div class="form-group col-md-3">' +
-                        '<input type="number" class="form-control productQuantity" name="productQuantity[]" required>' +
-                        '</div>' +
-                        '<div class="form-group col-md-1">' +
-                        '<button type="button" class="btn btn-danger removeProduct">-</button>' +
-                        '</div>' +
-                        '</div>';
-                    $('#productsContainer').append(newRow);
-                    
-                    // Apply Select2 on the new select element
-                    $('.select2').select2();
+                    var product = response.product;
+                    var existingProductRow = $('#productsContainer').find('input[value="' + product.productqr + '"]').closest('.productRow');
+                    if(existingProductRow.length > 0) {
+                        // If product already exists in the form, increase its quantity
+                        var quantityInput = existingProductRow.find('.productQuantity');
+                        var currentQuantity = parseInt(quantityInput.val());
+                        var pack = parseInt(product.pack);
+                        var newQuantity = currentQuantity + pack;
+                        quantityInput.val(newQuantity);
+                    } else {
+                        // If product does not exist in the form, add it
+                        var pack = parseInt(product.pack);
+                        var initialQuantity = pack;
+                        var newRow = '<div class="form-row productRow">' +
+                            '<div class="form-group col-md-8">' +
+                            '<input type="text" name="productqrrr[]" value="' + product.productqr + '" hidden>'+
+                            '<input type="text" name="productName[]" class="form-control" required readonly  value="' + product.product_name + '">'+
+                            '</div>' +
+                            '<div class="form-group col-md-3">' +
+                            '<input type="number" class="form-control productQuantity text-center" name="productQuantity[]" value="' + initialQuantity + '" readonly required>' +
+                            '<button type="button" class="btn btn-sm btn-secondary decreaseQuantity">-</button>' +
+                            '</div>' +
+                            '<div class="form-group col-md-1">' +
+                            '<button type="button" class="btn btn-icon btn-danger removeProduct"><i class="fas fa-times"></i></button>' +
+                            '</div>' +
+                            '</div>';
+                        $('#productsContainer').append(newRow);
+                    }
+                    // Clear the product ID field
+                    $('.productID').val('');
+                    // Clear the search field
+                    $('.productID').trigger('change.select2');
                 } else {
                     alert(response.message);
                 }
@@ -258,14 +250,29 @@ $(document).ready(function() {
         });
     });
 
-    // Remove product field with click on remove button
+    // Function to remove product from the form
     $(document).on('click', '.removeProduct', function() {
         $(this).closest('.productRow').remove();
     });
-    
-    // Apply Select2 on existing elements in the page
-    $('.select2').select2();
+
+    // Function to decrease product quantity
+    $(document).on('click', '.decreaseQuantity', function() {
+        var quantityInput = $(this).siblings('.productQuantity');
+        var newQuantity = parseInt(quantityInput.val()) - 1;
+        if (newQuantity >= 0) {
+            quantityInput.val(newQuantity);
+        }
+        // If quantity becomes zero, remove the product row
+        if (newQuantity === 0) {
+            $(this).closest('.productRow').remove();
+        }
+    });
 });
 
+document.addEventListener("DOMContentLoaded", function() {
+        var searchInput = document.getElementById("searchInput");
+        searchInput.focus();
+    });
 </script>
+
 <?php require_once '../../../footer.php'; ?>

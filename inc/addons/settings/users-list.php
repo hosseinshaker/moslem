@@ -38,10 +38,11 @@ if ($result->num_rows > 0) {
       
     <div class="row"><table class="table table-striped table-hover" id="tableExport" style="width:100%;">';
     echo "
-    <tr><th>نام کاربری</th><th>نام</th><th>عملیات</th></tr>";
+    <tr><th>نام کاربری</th><th>نام</th><th>ویرایش</th><th>حذف</th></tr>";
     while($row = $result->fetch_assoc()) {
         echo "<tr><td>" . $row["username"]. "</td><td>" . $row["name"]. "</td>";
-        echo "<td><a href='?delete=" . $row["id"] . "'>حذف</a></td></tr>";
+        echo "<td><a class='btn btn-icon btn-primary' href='edit-user.php?id=" . $row["id"] . "'><i class='far fa-edit'></i></a></td>";
+        echo "<td><a class='btn btn-icon btn-danger'  href='?delete=" . $row["id"] . "'><i class='fas fa-times'></a></td></tr>";
     }
     echo "</table>";
     echo '    </div>

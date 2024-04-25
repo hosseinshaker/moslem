@@ -86,7 +86,7 @@ if(!empty($message_sec)){
                     </div>
                     <div class="card-body">
                         <div class="col-md-12 form-group">
-                            <input type="number" class="form-control productID" placeholder="شناسه محصول را وارد کنید">
+                            <input type="number" class="form-control productID" placeholder="شناسه محصول را وارد کنید" id="searchInput">
                         </div>
                     </div>
                 </div>
@@ -223,6 +223,11 @@ if(!empty($message_sec)){
     });
 });
 
+
+document.addEventListener("DOMContentLoaded", function() {
+        var searchInput = document.getElementById("searchInput");
+        searchInput.focus();
+    });
 </script>
 
 <?php require_once '../../../footer.php'; ?>

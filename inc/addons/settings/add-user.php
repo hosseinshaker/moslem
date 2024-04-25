@@ -107,146 +107,47 @@ endif;
                                   
 
                                     <div class="form-group">
-                    <div class="control-label"> دسترسی های کاربر  </div>
-                    <p>مدیریت انبار محصول های اولیه</p>
-                    <label class="custom-switch mt-2">
-                      <input type="checkbox" name="access[1]" class="custom-switch-input">
-                      <span class="custom-switch-indicator"></span>
-                      <span class="custom-switch-description">تعریف مواد اولیه جدید</span>
-                    </label>  <br>
-                    <label class="custom-switch mt-2">
-                      <input type="checkbox" name="access[2]" class="custom-switch-input">
-                      <span class="custom-switch-indicator"></span>
-                      <span class="custom-switch-description">لیست مواد های اولیه</span>
-                    </label>  <br>
-                    <label class="custom-switch mt-2">
-                      <input type="checkbox" name="access[3]" class="custom-switch-input">
-                      <span class="custom-switch-indicator"></span>
-                      <span class="custom-switch-description">خروج مواد اولیه</span>
-                    </label>  <br>
-                    <label class="custom-switch mt-2">
-                      <input type="checkbox" name="access[4]" class="custom-switch-input">
-                      <span class="custom-switch-indicator"></span>
-                      <span class="custom-switch-description">ورود مواد اولیه</span>
-                    </label>  <br>
-                    <label class="custom-switch mt-2">
-                      <input type="checkbox" name="access[5]" class="custom-switch-input">
-                      <span class="custom-switch-indicator"></span>
-                      <span class="custom-switch-description">گزارش ورود/خروج مواد اولیه</span>
-                    </label>  
-                    <p>مدیریت انبار محصول</p>
-                    <label class="custom-switch mt-2">
-                      <input type="checkbox" name="access[6]" class="custom-switch-input">
-                      <span class="custom-switch-indicator"></span>
-                      <span class="custom-switch-description">ثبت خروج محصول</span>
-                    </label>  <br>
-                    <label class="custom-switch mt-2">
-                      <input type="checkbox" name="access[7]" class="custom-switch-input">
-                      <span class="custom-switch-indicator"></span>
-                      <span class="custom-switch-description">ثبت ورود محصول</span>
-                    </label>  <br>
-                    <label class="custom-switch mt-2">
-                      <input type="checkbox" name="access[8]" class="custom-switch-input">
-                      <span class="custom-switch-indicator"></span>
-                      <span class="custom-switch-description">تعریف محصول جدید</span>
-                    </label>  <br>
-                    <label class="custom-switch mt-2">
-                      <input type="checkbox" name="access[9]" class="custom-switch-input">
-                      <span class="custom-switch-indicator"></span>
-                      <span class="custom-switch-description">لیست محصول های خروجی</span>
-                    </label>  <br>
-                    <label class="custom-switch mt-2">
-                      <input type="checkbox" name="access[10]" class="custom-switch-input">
-                      <span class="custom-switch-indicator"></span>
-                      <span class="custom-switch-description">لیست محصول های ورودی</span>
-                    </label>  <br>
-                    <label class="custom-switch mt-2">
-                      <input type="checkbox" name="access[11]" class="custom-switch-input">
-                      <span class="custom-switch-indicator"></span>
-                      <span class="custom-switch-description">محاسبه مواد اولیه هر محصول</span>
-                    </label>  
-                    <p>مدیریت کاربران و خیاط ها</p>
-                    <label class="custom-switch mt-2">
-                      <input type="checkbox" name="access[12]" class="custom-switch-input">
-                      <span class="custom-switch-indicator"></span>
-                      <span class="custom-switch-description">ثبت کاربر جدید</span>
-                    </label>  <br>
-                    <label class="custom-switch mt-2">
-                      <input type="checkbox" name="access[13]" class="custom-switch-input">
-                      <span class="custom-switch-indicator"></span>
-                      <span class="custom-switch-description">لیست کاربران</span>
-                    </label>  <br>
-                    <label class="custom-switch mt-2">
-                      <input type="checkbox" name="access[14]" class="custom-switch-input">
-                      <span class="custom-switch-indicator"></span>
-                      <span class="custom-switch-description">افزودن موجودی انبار کاربر</span>
-                    </label>  <br>
-             
-                    <label class="custom-switch mt-2">
-                      <input type="checkbox" name="access[16]" class="custom-switch-input">
-                      <span class="custom-switch-indicator"></span>
-                      <span class="custom-switch-description">کاهش موجودی انبار کاربر</span>
-                    </label>  <br>
-                  
-                    <label class="custom-switch mt-2">
-                      <input type="checkbox" name="access[18]" class="custom-switch-input">
-                      <span class="custom-switch-indicator"></span>
-                      <span class="custom-switch-description">لیست موجودی کاربران</span>
-                    </label>  <br>
-                    <label class="custom-switch mt-2">
-                      <input type="checkbox" name="access[19]" class="custom-switch-input">
-                      <span class="custom-switch-indicator"></span>
-                      <span class="custom-switch-description">محاسبه حقوق کاربر</span>
-                    </label>  <br>
+    <div class="control-label"> دسترسی های کاربر  </div>
+    <?php
+    $access_list = array(
+        1 => 'تعریف مواد اولیه جدید',
+        2 => 'لیست مواد های اولیه',
+        3 => 'خروج مواد اولیه',
+        4 => 'ورود مواد اولیه',
+        5 => 'گزارش ورود/خروج مواد اولیه',
+        6 => 'ثبت خروج محصول',
+        7 => 'ثبت ورود محصول',
+        8 => 'تعریف محصول جدید',
+        9 => 'لیست محصول های خروجی',
+        10 => 'لیست محصول های ورودی',
+        11 => 'محاسبه مواد اولیه هر محصول',
+        12 => 'ثبت کاربر جدید',
+        13 => 'لیست کاربران',
+        14 => 'افزودن موجودی انبار کاربر',
+        16 => 'کاهش موجودی انبار کاربر',
+        18 => 'لیست موجودی کاربران',
+        19 => 'محاسبه حقوق کاربر',
+        20 => 'تنظیمات',
+        21 => 'لیست پرسنل سامانه',
+        22 => 'افزودن پرسنل به سامانه',
+        23 => 'پشتیبان گیری از اطلاعات',
+        25 => 'مدیریت رنگ ها',
+        15 => 'افزودن رنگ',
+        17 => 'افزودن طرح',
+        26 => 'مدیریت طرح ها'
+    );
 
-					
-					
-					
-					
-					
-					
-                    <p>مدیریت سامانه</p>
-                    <label class="custom-switch mt-2">
-                      <input type="checkbox" name="access[20]" class="custom-switch-input">
-                      <span class="custom-switch-indicator"></span>
-                      <span class="custom-switch-description">تنظیمات</span>
-                    </label>  <br>
-                    <label class="custom-switch mt-2">
-                      <input type="checkbox" name="access[21]" class="custom-switch-input">
-                      <span class="custom-switch-indicator"></span>
-                      <span class="custom-switch-description">لیست پرسنل سامانه</span>
-                    </label>  <br>
-                    <label class="custom-switch mt-2">
-                      <input type="checkbox" name="access[22]" class="custom-switch-input">
-                      <span class="custom-switch-indicator"></span>
-                      <span class="custom-switch-description">افزودن پرسنل به سامانه</span>
-                    </label>  <br>
-                    <label class="custom-switch mt-2">
-                      <input type="checkbox" name="access[23]" class="custom-switch-input">
-                      <span class="custom-switch-indicator"></span>
-                      <span class="custom-switch-description">پشتیبان گیری از اطلاعات</span>
-                    </label>  <br>
-                    <label class="custom-switch mt-2">
-                      <input type="checkbox" name="access[25]" class="custom-switch-input">
-                      <span class="custom-switch-indicator"></span>
-                      <span class="custom-switch-description">مدیریت رنگ ها</span>
-                    </label>  <br>
-                    <label class="custom-switch mt-2">
-                      <input type="checkbox" name="access[15]" class="custom-switch-input">
-                      <span class="custom-switch-indicator"></span>
-                      <span class="custom-switch-description"> افزودن رنگ</span>
-                    </label>  <br>
-                    <label class="custom-switch mt-2">
-                      <input type="checkbox" name="access[17]" class="custom-switch-input">
-                      <span class="custom-switch-indicator"></span>
-                      <span class="custom-switch-description"> افزودن طرح</span>
-                    </label>  <br>
-                    <label class="custom-switch mt-2">
-                      <input type="checkbox" name="access[26]" class="custom-switch-input">
-                      <span class="custom-switch-indicator"></span>
-                      <span class="custom-switch-description">مدیریت طرح ها</span>
-                    </label>  <br>
-                  </div>
+    foreach ($access_list as $key => $access_item) {
+       // echo '<p>' . $access_item . '</p>';
+        echo '<label class="custom-switch mt-2">';
+        echo '<input type="checkbox" name="access[' . $key . ']" class="custom-switch-input">';
+        echo '<span class="custom-switch-indicator"></span>';
+        echo '<span class="custom-switch-description">' . $access_item . '</span>';
+        echo '</label><br>';
+    }
+    ?>
+</div>
+
 
                                     <button class="btn btn-primary" name="insert">افزودن</button>
                                 </div>

@@ -1,9 +1,10 @@
 <?php
-$title_page = "فرم مشاهده  موجودی کاربران";
+$title_page = "فرم گزارش محصولات خروجی";
 require_once '../../../header.php';
-// نمایش کاربران
-$sql_users = "SELECT * FROM users";
-$result_user = $connection->query($sql_users);
+
+// دستور SELECT برای دریافت لیست محصولات
+$sql = "SELECT DISTINCT product_Name FROM products";
+$result = $connection->query($sql);
 ?>
 <div class="main-content">
     <section class="section">
@@ -11,26 +12,15 @@ $result_user = $connection->query($sql_users);
             <div class="col-12 col-md-12 col-lg-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4>فرم مشاهده موجودی کاربران</h4>
+                        <h4>فرم جستجو میان فاکتور های خروجی</h4>
                     </div>
                     <div class="card-body">
-                        <form method="post" action="dastmozd-list.php">
+                        <form method="post" action="list-output-product.php">
                             <nav class="form-row">
                                 <nav class="form-group col-md-4">
-
                                     <div class="form-group">
-                                        <label>نام خیاط یا کاربر را وارد کنید</label>
-                                        <select name="username" class="form-control select2" require_once>
-                                            <option value="">انتخاب کنید</option>
-                                            <?php
-                                            if ($result_user->num_rows > 0) {
-                                                while($row = $result_user->fetch_assoc()) {
-                                                    echo '<option value="'.$row['username'].'">'.$row['username'].'</option>';
-                                                }
-                                            } else {
-                                                echo "<option>نتیجه‌ای یافت نشد</option>";
-                                            }
-                                            ?>
+                                        <label>شناسه خروج</label>
+                                          <input type="number" class="form-control" name="entry_id">
                                         </select>
                                     </div>
                                 </nav>
@@ -57,4 +47,5 @@ $result_user = $connection->query($sql_users);
         </div>
     </section>
 </div>
-<?php require_once '../../../footer.php';?>
+
+<?php require_once '../../../footer.php'; ?>

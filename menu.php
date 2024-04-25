@@ -45,7 +45,7 @@ echo "$value";
                     <li><a class="nav-link" href="<?php echo $base_url; ?>/inc/addons/products/form-output.php">گزارش محصول های خروجی</a></li>
                     <?php  } ?>  
                     <?php if (in_array(10, $accessArray)) {?>
-                    <li><a class="nav-link" href="<?php echo $base_url; ?>/inc/addons/products/form-input.php">گزارش محصول های ورودی</a></li>
+                    <li><a class="nav-link" href="<?php echo $base_url; ?>/inc/addons/products/form-list-input.php">گزارش محصول های ورودی</a></li>
                     <?php  } ?>  
                     <?php if (in_array(11, $accessArray)) {?>
                     <li><a class="nav-link" href="<?php echo $base_url; ?>/inc/addons/products/productslist.php"> لیست محصولات </a></li>

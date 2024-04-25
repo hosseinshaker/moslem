@@ -46,7 +46,7 @@ $result = $connection->query($sql);
                     <h4><?php echo $title_page;  ?></h4>
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive">
+                    <div class="table-responsive text-center">
                         <?php if ($result->num_rows > 0) : ?>
                             <table class="table table-striped table-hover" id="tableExport" style="width:100%;">
                                 <thead>
@@ -61,7 +61,7 @@ $result = $connection->query($sql);
                                     <?php while ($row = $result->fetch_assoc()) : ?>
                                         <tr>
                                             <td><?php echo $row['productqr']; ?></td>
-                                            <td><?php echo $row['product_name']; ?></td>
+                                            <td class="text-left"><?php echo $row['product_name']; ?></td>
                                             <td><?php echo $row['stock']; ?></td>
                                             <td>
                                                 <a href="edit-product.php?id=<?php echo $row['id']; ?>" class="btn btn-icon btn-primary"><i class="far fa-edit"></i></a>
