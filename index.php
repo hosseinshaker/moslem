@@ -4,7 +4,7 @@ require_once 'header.php';
 ?>
 <div class="main-content">
 <nav class="row">
- <nav class="col-md-4">
+ <nav class="col-md-12">
      <nav class="card">
          <nav class="card-header">
              <h6>هشدار موجودی محصول در انبار</h6>
@@ -40,17 +40,17 @@ displayLowStockProducts($connection);
          </nav>
      </nav>
  </nav>
-    <nav class="col-md-4">
+    <nav class="col-md-3">
         <nav class="card">
             <nav class="card-header">
                 <h6>پشتیبان گیری از اطلاعات</h6>
             </nav>
             <nav class="card-body">
-                <a class="btn btn-success" href="backup.php">مشاهده</a>
+                <a class="btn btn-success" href="backup.php">پشتیبان گیری</a>
             </nav>
         </nav>
     </nav>
-    <nav class="col-md-4">
+    <nav class="col-md-3">
         <nav class="card">
             <nav class="card-header">
                 <h6>خروج از سامانه</h6>
