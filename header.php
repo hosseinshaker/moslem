@@ -48,7 +48,7 @@ tbody>tr>td{
 </style>
 </head>
 <body class="">
-<div class="loader0"></div>
+<div class="loader"></div>
 <div id="app">
     <div class="main-wrapper main-wrapper-1">
         <div class="navbar-bg"></div>
