@@ -30,7 +30,7 @@ echo "$value";
             <?php  if (in_array(6, $accessArray) || in_array(7, $accessArray) || in_array(8, $accessArray) || in_array(9, $accessArray) || in_array(10, $accessArray)) {?>
             <li class="dropdown ">
                 <a href="#" class="nav-link has-dropdown"><i data-feather="server"></i><span>انبار محصول</span></a>
-                <ul class="dropdown-menu">
+                <ul class="dropdown-menu" style="display: block;">
                 <?php  } ?>
                 <?php if (in_array(6, $accessArray)) {?>
                 <li><a class="nav-link" href="<?php echo $base_url; ?>/inc/addons/products/Product-output.php">ثبت خروج محصول از انبار</a></li>
