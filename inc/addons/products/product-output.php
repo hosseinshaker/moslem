@@ -273,6 +273,21 @@ document.addEventListener("DOMContentLoaded", function() {
         var searchInput = document.getElementById("searchInput");
         searchInput.focus();
     });
+
+
+    document.addEventListener("DOMContentLoaded", function() {
+    var noPasteInput = document.getElementById('searchInput');
+    
+    // ممنوع کردن کپی کردن محتویات
+    noPasteInput.addEventListener('copy', function(e) {
+        e.preventDefault();
+    });
+    
+    // ممنوع کردن جایگذاری محتویات
+    noPasteInput.addEventListener('paste', function(e) {
+        e.preventDefault();
+    });
+});
 </script>
 
 <?php require_once '../../../footer.php'; ?>
